@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Trying to ignore User-specific and build files
+#	Ideas gotten from
+## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
+
+# Build Results
