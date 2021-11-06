@@ -3,7 +3,7 @@
 
 // Big-endian
 //	How do I know when to use which?
-constexpr auto VBPSHEADERBIG = (('V'<<24)+('B'<<16)+('S'<<8)+'P');
+constexpr auto VBSPHEADERBIG = (('V'<<24)+('B'<<16)+('S'<<8)+'P');
 
 // Little-endian
 constexpr auto VBSPHEADER = (('P'<<24)+('S'<<16)+('B'<<8)+'V');
@@ -135,6 +135,7 @@ public:
 private:
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
 	ifstream m_bsp_file;
+	bsp_header m_head;
 };
 
 #endif /* BSP_READER_H */
