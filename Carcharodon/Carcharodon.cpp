@@ -3,10 +3,12 @@
 
 #include "Carcharodon.h"
 
-using namespace std;
 
 int main()
 {
-	cout << "Hello CMake." << endl;
+	int n = 1;
+	if (*(char *)&n == 1)
+		std::cout << "Little endian" << std::endl;
+	std::cout << "Hello CMake." << std::endl;
 	return 0;
 }
