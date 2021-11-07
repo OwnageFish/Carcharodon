@@ -1,8 +1,10 @@
 ﻿// Carcharodon.cpp : Defines the entry point for the application.
 //
 
-#include "Carcharodon.h"
+#include <iostream>
 
+//#include "Carcharodon.h"
+#include "BspProcessor.h"
 
 int main()
 {

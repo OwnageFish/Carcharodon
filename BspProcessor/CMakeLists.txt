@@ -3,7 +3,13 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+include_directories(
+	"."
+)
+
 # Add source to this project's executable.
-add_library (BspProcessor "BspProcessor.cpp" "BspProcessor.h")
+add_library (BspProcessor SHARED
+	"BspProcessor.cpp"
+)
 
 # TODO: Add tests and install targets if needed.

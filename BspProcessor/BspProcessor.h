@@ -28,18 +28,18 @@ struct point3s {
 	int16_t z;
 };
 
-struct bsp_header {
-	uint32_t magic;
-	uint32_t version;
-	bsp_lump lumps[VHEADERLUMPS];
-	uint32_t map_revision;
-};
-
 struct bsp_lump {
 	uint32_t offset;		// offset (in bytes) of the data from the beginning of the file 
 	uint32_t length;		// length (in bytes) of the data
 	uint32_t version;
 	char	lmpID[4];		// Lump ID 
+};
+
+struct bsp_header {
+	uint32_t magic;
+	uint32_t version;
+	bsp_lump lumps[VHEADERLUMPS];
+	uint32_t map_revision;
 };
 
 struct bsp_plane {
@@ -55,12 +55,12 @@ struct bsp_edge {
 class BspProcessor {
 public:
 	BspProcessor();
-	BspProcessor(char* file_name);
+	BspProcessor(std::string file_name);
 	
 	
-	load(char* file_name);
-	write(char* file_name);
-	io(char* file_name)
+	void read_from_file(std::string file_name);
+	void write_to_file(std::string file_name);
+	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op);
 	/* Potential future functions to add that are not very difficult.
 	BspReader();
 	int file(char* file_name);
@@ -69,7 +69,7 @@ public:
 	~BspProcessor();
 private:
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
-	ifstream m_bsp_file;
+	//std::ifstream m_bsp_file;
 	bsp_header m_head;
 
 
