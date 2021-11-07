@@ -8,20 +8,13 @@ include_directories (
 	"${PROJECT_SOURCE_DIR}/BspProcessor"
 )
 
+target_link_libraries(BspReader)
 # Add BspReader object library?
 #add_library ($<TARGET_OBJECTS:BspReader>)
 
 link_directories ( "${LIBRARY_OUTPUT_PATH}" )
 
 # Add source to this project's executable.
-add_executable (Carcharodon "Carcharodon.cpp")
-
-add_dependencies (Carcharodon
-	BspProcessor
-)
-
-target_link_libraries (Carcharodon
-	BspProcessor
-)
+add_executable (Carcharodon "Carcharodon.cpp" "Carcharodon.h" ${BspR)
 
 # TODO: Add tests and install targets if needed.
