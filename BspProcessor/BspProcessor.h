@@ -56,8 +56,8 @@ class BspProcessor {
 public:
 	BspProcessor();
 	BspProcessor(std::string file_name);
-	
-	
+
+
 	void read_from_file(std::string file_name);
 	void write_to_file(std::string file_name);
 	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op);
@@ -71,6 +71,7 @@ private:
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
 	//std::ifstream m_bsp_file;
 	bsp_header m_head;
+	char buff;
 
 
 };
