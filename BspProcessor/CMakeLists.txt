@@ -8,7 +8,7 @@ include_directories(
 )
 
 # Add source to this project's executable.
-add_library (BspProcessor SHARED
+add_library (BspProcessor
 	"BspProcessor.cpp"
 )
 

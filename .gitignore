@@ -10,6 +10,7 @@
 # Precompiled Headers
 *.gch
 *.pch
+*.ipch
 
 # Compiled Dynamic libraries
 *.so
@@ -33,9 +34,12 @@
 
 # Visual C++ cache files
 *.aps
+*.idb
+*.lastbuildstate
 *.ncb
 *.opendb
 *.opensdf
+*.pdb
 *.sdf
 *.cachefile
 

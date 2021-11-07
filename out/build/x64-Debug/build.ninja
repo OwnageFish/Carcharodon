@@ -87,7 +87,7 @@ build Carcharodon\CMakeFiles\Carcharodon.dir\Carcharodon.cpp.obj: CXX_COMPILER__
 #############################################
 # Link the executable Carcharodon\Carcharodon.exe
 
-build Carcharodon\Carcharodon.exe: CXX_EXECUTABLE_LINKER__Carcharodon_Debug Carcharodon\CMakeFiles\Carcharodon.dir\Carcharodon.cpp.obj | lib\BspProcessor.lib || lib\BspProcessor.dll
+build Carcharodon\Carcharodon.exe: CXX_EXECUTABLE_LINKER__Carcharodon_Debug Carcharodon\CMakeFiles\Carcharodon.dir\Carcharodon.cpp.obj | lib\BspProcessor.lib || lib\BspProcessor.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = lib\BspProcessor.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
@@ -129,7 +129,7 @@ build Carcharodon\rebuild_cache: phony Carcharodon\CMakeFiles\rebuild_cache.util
 # =============================================================================
 
 # =============================================================================
-# Object build statements for SHARED_LIBRARY target BspProcessor
+# Object build statements for STATIC_LIBRARY target BspProcessor
 
 
 #############################################
@@ -138,33 +138,29 @@ build Carcharodon\rebuild_cache: phony Carcharodon\CMakeFiles\rebuild_cache.util
 build cmake_object_order_depends_target_BspProcessor: phony || BspProcessor\CMakeFiles\BspProcessor.dir
 
 build BspProcessor\CMakeFiles\BspProcessor.dir\BspProcessor.cpp.obj: CXX_COMPILER__BspProcessor_Debug ..\..\..\BspProcessor\BspProcessor.cpp || cmake_object_order_depends_target_BspProcessor
-  DEFINES = -DBspProcessor_EXPORTS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   INCLUDES = -I..\..\..\BspProcessor\.
   OBJECT_DIR = BspProcessor\CMakeFiles\BspProcessor.dir
   OBJECT_FILE_DIR = BspProcessor\CMakeFiles\BspProcessor.dir
-  TARGET_COMPILE_PDB = BspProcessor\CMakeFiles\BspProcessor.dir\
+  TARGET_COMPILE_PDB = BspProcessor\CMakeFiles\BspProcessor.dir\BspProcessor.pdb
   TARGET_PDB = lib\BspProcessor.pdb
 
 
 # =============================================================================
-# Link build statements for SHARED_LIBRARY target BspProcessor
+# Link build statements for STATIC_LIBRARY target BspProcessor
 
 
 #############################################
-# Link the shared library lib\BspProcessor.dll
+# Link the static library lib\BspProcessor.lib
 
-build lib\BspProcessor.dll lib\BspProcessor.lib: CXX_SHARED_LIBRARY_LINKER__BspProcessor_Debug BspProcessor\CMakeFiles\BspProcessor.dir\BspProcessor.cpp.obj
+build lib\BspProcessor.lib: CXX_STATIC_LIBRARY_LINKER__BspProcessor_Debug BspProcessor\CMakeFiles\BspProcessor.dir\BspProcessor.cpp.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  LINK_FLAGS = /machine:x64 /debug /INCREMENTAL
-  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_FLAGS = /machine:x64
   OBJECT_DIR = BspProcessor\CMakeFiles\BspProcessor.dir
-  POST_BUILD = cmd.exe /C "cd /D C:\Users\Dendygar\Source\Repos\OwnageFish\Carcharodon\out\build\x64-Debug\BspProcessor && C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/dev/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/Dendygar/Source/Repos/OwnageFish/Carcharodon/out/build/x64-Debug/lib/BspProcessor.dll -installedDir C:/dev/vcpkg/installed/x64-windows/debug/bin -OutVariable out"
+  POST_BUILD = cd .
   PRE_LINK = cd .
-  RESTAT = 1
-  TARGET_COMPILE_PDB = BspProcessor\CMakeFiles\BspProcessor.dir\
-  TARGET_FILE = lib\BspProcessor.dll
-  TARGET_IMPLIB = lib\BspProcessor.lib
+  TARGET_COMPILE_PDB = BspProcessor\CMakeFiles\BspProcessor.dir\BspProcessor.pdb
+  TARGET_FILE = lib\BspProcessor.lib
   TARGET_PDB = lib\BspProcessor.pdb
 
 
@@ -193,9 +189,9 @@ build BspProcessor\rebuild_cache: phony BspProcessor\CMakeFiles\rebuild_cache.ut
 # =============================================================================
 # Target aliases.
 
-build BspProcessor: phony lib\BspProcessor.dll
+build BspProcessor: phony lib\BspProcessor.lib
 
-build BspProcessor.dll: phony lib\BspProcessor.dll
+build BspProcessor.lib: phony lib\BspProcessor.lib
 
 build Carcharodon: phony Carcharodon\Carcharodon.exe
 
@@ -216,7 +212,7 @@ build all: phony Carcharodon\all BspProcessor\all
 #############################################
 # Folder: C:/Users/Dendygar/Source/Repos/OwnageFish/Carcharodon/out/build/x64-Debug/BspProcessor
 
-build BspProcessor\all: phony lib\BspProcessor.dll
+build BspProcessor\all: phony lib\BspProcessor.lib
 
 # =============================================================================
 

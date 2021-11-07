@@ -1,10 +1,10 @@
 {
   "ExpandedNodes": [
     "",
+    "\\BspProcessor",
     "\\Carcharodon",
-    "\\out",
-    "\\out\\build"
+    "\\out"
   ],
-  "SelectedNode": "\\out",
+  "SelectedNode": "\\Carcharodon\\CMakeLists.txt",
   "PreviewInSolutionExplorer": false
 }
