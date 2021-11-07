@@ -5,5 +5,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("Carcharodon")
 
+add_library($<TARGET_OBJECTS:BspProcessor>)
+
 # Include sub-projects.
 add_subdirectory ("Carcharodon")
+add_subdirectory ("BspReader")

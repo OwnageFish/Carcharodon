@@ -4,11 +4,11 @@
 cmake_minimum_required (VERSION 3.8)
 
 
-target_link_libraries(BspReader)
+target_link_libraries(BspProcessor)
 # Add BspReader object library?
 #add_library ($<TARGET_OBJECTS:BspReader>)
 
 # Add source to this project's executable.
-add_executable (Carcharodon "Carcharodon.cpp" "Carcharodon.h" ${BspR)
+add_executable (Carcharodon "Carcharodon.cpp" "Carcharodon.h" ${BspProcessor})
 
 # TODO: Add tests and install targets if needed.
