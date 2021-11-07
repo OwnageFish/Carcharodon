@@ -12,5 +12,7 @@ int main()
 	if (*(char *)&n == 1)
 		std::cout << "Little endian" << std::endl;
 	std::cout << "Hello CMake." << std::endl;
+
+	BspProcessor process;
 	return 0;
 }
