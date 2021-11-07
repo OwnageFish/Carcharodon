@@ -32,16 +32,9 @@
 *.out
 *.app
 
-# Visual C++ cache files
-*.aps
-*.idb
-*.lastbuildstate
-*.ncb
-*.opendb
-*.opensdf
-*.pdb
-*.sdf
-*.cachefile
+# Nothing in out or .vs directories
+.vs/*
+out/*
 
 # Trying to ignore User-specific and build files
 #	Ideas gotten from
