@@ -1,9 +1,0 @@
-# ninja log v5
-1	435	6579835641153587	Carcharodon/CMakeFiles/Carcharodon.dir/Carcharodon.cpp.obj	c58a5db2e2938c85
-877	1392	6579834463787245	BspProcessor/BspProcessor.dll	ba666e482ba9f13b
-0	876	6579834463787245	BspProcessor/CMakeFiles/BspProcessor.dir/BspProcessor.cpp.obj	c39a9aed0169406b
-3	629	6579834463787245	lib/BspProcessor.lib	fdaf0d22b7b1a8d9
-3	629	6579834463787245	lib/BspProcessor.dll	fdaf0d22b7b1a8d9
-1	892	6580119610488368	BspProcessor/CMakeFiles/BspProcessor.dir/BspProcessor.cpp.obj	732ffeb81a1b38c3
-893	950	6580119611088502	lib/BspProcessor.lib	aefb4973063f8198
-951	1611	6580119613899134	Carcharodon/Carcharodon.exe	ecb3a07234f90219
