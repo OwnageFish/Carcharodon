@@ -24,4 +24,8 @@ target_link_libraries (Carcharodon
 	BspProcessor
 )
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test.txt
+	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 # TODO: Add tests and install targets if needed.
