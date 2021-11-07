@@ -4,7 +4,7 @@
 #include "BspLumps.h"
 #include <fstream>		// For reading and writing the bsp file
 #include <cstdint>		// For specific int types
-
+#include <functional>
 
 // Big-endian
 //	How do I know when to use which?
@@ -57,8 +57,10 @@ public:
 	BspProcessor();
 	BspProcessor(char* file_name);
 	
+	
 	load(char* file_name);
 	write(char* file_name);
+	io(char* file_name)
 	/* Potential future functions to add that are not very difficult.
 	BspReader();
 	int file(char* file_name);
