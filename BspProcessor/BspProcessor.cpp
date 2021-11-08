@@ -34,35 +34,37 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 		<< std::endl;
 	std::cout << "}" << std::endl;
 
-	std::cout << "Size of edge: " << sizeof(bsp_edge) << std::endl;
-	std::cout << "I expect 432 Edges" << std::endl;
-	
-	
+
+
+	unsigned int num_edges = m_head.lumps[BSP_FILE::EDGES].length / sizeof(bsp_edge);
 	file_stream.seekg(m_head.lumps[BSP_FILE::EDGES].offset, std::ios::beg);
-	bsp_edge test_edge;
-	file_op(file_stream, reinterpret_cast <char*> (&test_edge), sizeof(bsp_edge));
-	std::cout << std::to_string(test_edge.vert[0]) << ", " << std::to_string(test_edge.vert[1]) << std::endl;	// There we go
+	bsp_edge in_edge;
+	m_edges_wut.resize(num_edges);
+	for (int i = 0; i < num_edges; i++) {
+		file_op(file_stream, reinterpret_cast <char*> (&in_edge), sizeof(bsp_edge));
+		m_edges_wut[i] = in_edge;
+	}
 
-	file_op(file_stream, reinterpret_cast <char*> (&test_edge), sizeof(bsp_edge));
-	std::cout << std::to_string(test_edge.vert[0]) << ", " << std::to_string(test_edge.vert[1]) << std::endl;	// There we go
-	file_op(file_stream, reinterpret_cast <char*> (&test_edge), sizeof(bsp_edge));
-	std::cout << std::to_string(test_edge.vert[0]) << ", " << std::to_string(test_edge.vert[1]) << std::endl;	// There we go
-	file_op(file_stream, reinterpret_cast <char*> (&test_edge), sizeof(bsp_edge));
-	std::cout << std::to_string(test_edge.vert[0]) << ", " << std::to_string(test_edge.vert[1]) << std::endl;	// There we go
-
-
+	std::cout << "Edge info: " << std::endl;
+	std::cout << m_edges_wut.size() << std::endl;
+	std::cout << m_edges_wut[0].vert[0] << ", " << m_edges_wut[0].vert[1] << std::endl;
+	std::cout << m_edges_wut[1].vert[0] << ", " << m_edges_wut[1].vert[1] << std::endl;
+	std::cout << m_edges_wut[2].vert[0] << ", " << m_edges_wut[2].vert[1] << std::endl;
 
 	/*
 	// Trying to read in edges
 	file_stream.seekg(m_head.lumps[BSP_FILE::EDGES].offset, std::ios::beg);
-	uint32_t num_edges = m_head.lumps[BSP_FILE::EDGES].length / sizeof(bsp_edge);
+	unsigned int num_edges = m_head.lumps[BSP_FILE::EDGES].length / sizeof(bsp_edge);
+	std::cout << num_edges << std::endl;
 	m_edges = new bsp_edge[num_edges];
+	//std::cout << std::to_string(m_edges[0].vert[0]) << ", " << std::to_string(m_edges[0].vert[1]) << std::endl;
 	// I think this should work
 	file_op(file_stream, reinterpret_cast <char*> (&m_edges), m_head.lumps[BSP_FILE::EDGES].length);
 	//file_op(file_stream, reinterpret_cast < char * > (&m_edges), sizeof(bsp_edge) * num_edges);
 	std::cout << num_edges << std::endl;
-	std::cout << std::to_string(m_edges[0].vert[0]) << ", " << std::to_string(m_edges[0].vert[1]) << std::endl;
+	std::cout << m_edges[0].vert[0] << ", " << m_edges[0].vert[1] << std::endl;
 	*/
+	
 }
 
 void BspProcessor::read_from_file(std::string file_path) {
