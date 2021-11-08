@@ -6,6 +6,9 @@
 #include <fstream>
 #include <functional>
 
+#include <cstdlib>
+
+
 BspProcessor::BspProcessor() {
 
 }
@@ -64,20 +67,19 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 
 void BspProcessor::read_from_file(std::string file_path) {
 	//std::function<std::fstream& (std::fstream&, const char*, std::streamsize)> read_f = [](std::fstream& file, const char* s, std::streamsize n) {
-	
 	std::function < void(std::fstream&, char *, std::streamsize) > read_f = [](std::fstream& file, char* dest, std::streamsize dest_sz) {
 		file.read ( dest, dest_sz );
 	};
 	
-
 	std::fstream fs;
 	fs.open(file_path, std::fstream::in | std::fstream::binary);
-	if (fs.is_open()) {
-		std::cout << "File opened: " << file_path << std::endl;
-		this->io(fs, read_f);
+	if (!fs.is_open()) {
+		std::cerr << "ERROR: file not open" << std::endl;
+		this->~BspProcessor();
+		std::exit(EXIT_FAILURE);
 	}
-	else
-		std::cout << "File " << file_path << " could not be opened." << std::endl;
+
+	this->io(fs, read_f);
 }
 
 void BspProcessor::write_to_file ( std::string file_path ) {
@@ -86,7 +88,12 @@ void BspProcessor::write_to_file ( std::string file_path ) {
 	};
 
 	std::fstream fs;
-	fs.open(file_path, std::fstream::out); // | std::fstream::binary);
+	fs.open(file_path, std::fstream::out | std::fstream::binary);
+	if (!fs.is_open()) {
+		std::cerr << "ERROR: file not open" << std::endl;
+		this->~BspProcessor();
+		std::exit(EXIT_FAILURE);
+	}
 
 	this->io(fs, write_f);
 }
