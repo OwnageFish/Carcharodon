@@ -76,7 +76,7 @@ template<typename bsp_struct_T>
 void BspProcessor::struct_io(std::fstream& file_stream, 
 							 std::function < void(std::fstream&, char*, std::streamsize) > file_op, 
 							 std::vector < bsp_struct_T > bsp_vec, int lump_indx) {
-	unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(T);
+	unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(bsp_struct_T);
 	bsp_struct_T temp;
 	// Should probably clear this and resize. So if it was already being used it can be reused.
 	bsp_vec.resize(num_structs);
