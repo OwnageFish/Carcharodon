@@ -37,22 +37,18 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 
 
 
-	unsigned int num_edges = m_head.lumps[BSP_FILE::EDGES].length / sizeof(bsp_edge);
-	file_stream.seekg(m_head.lumps[BSP_FILE::EDGES].offset, std::ios::beg);
-	m_edges.resize(num_edges);
-	/*for (int i = 0; i < num_edges; i++) {
-		file_op(file_stream, reinterpret_cast <char*> (&in_edge), sizeof(bsp_edge));
-		m_edges_wut[i] = in_edge;
-	}*/
-	file_op(file_stream, reinterpret_cast <char*> (&m_edges[0]), sizeof(bsp_edge) * num_edges /* == m_head.lumps[BSP_FILE::EDGES].length */);
+	struct_io(file_stream, file_op, m_edges, BSP_FILE::EDGES);
+	struct_io(file_stream, file_op, m_vertexes, BSP_FILE::VERTEXES);
 
+	/*
 	unsigned int num_vertexes = m_head.lumps[BSP_FILE::VERTEXES].length / sizeof(point3f);
 	file_stream.seekg(m_head.lumps[BSP_FILE::VERTEXES].offset, std::ios::beg);
 	m_vertexes.resize(num_vertexes);
-	file_op(file_stream, reinterpret_cast <char*> (&m_vertexes[0]), sizeof(point3f) * num_vertexes /* == m_head.lumps[BSP_FILE::VERTEXES].length */ );
+	file_op(file_stream, reinterpret_cast <char*> (&m_vertexes[0]), m_head.lumps[BSP_FILE::VERTEXES].length );
+	*/
 
 	std::cout << "Num edges: " << m_edges.size() << std::endl;
-	for (int i = 0; i < num_edges; i++)
+	for (int i = 0; i < m_edges.size(); i++)
 		std::cout << i << ": " << m_edges[i].vert[0] << " - x=" << m_vertexes[m_edges[i].vert[0]].x << " y=" << m_vertexes[m_edges[i].vert[0]].y << " z=" << m_vertexes[m_edges[i].vert[0]].z
 				  << ", "      << m_edges[i].vert[1] << " - x=" << m_vertexes[m_edges[i].vert[1]].x << " y=" << m_vertexes[m_edges[i].vert[1]].y << " z=" << m_vertexes[m_edges[i].vert[1]].z
 				  << std::endl;
@@ -80,20 +76,18 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 template<typename bsp_struct_T>
 void BspProcessor::struct_io(std::fstream& file_stream, 
 							 std::function < void(std::fstream&, char*, std::streamsize) > file_op, 
-							 std::vector < bsp_struct_T > bsp_vec, int lump_indx) {
+							 std::vector < bsp_struct_T > &bsp_vec, int lump_indx) {
 	unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(bsp_struct_T);
-	bsp_struct_T temp;
+	// Check for error
+	if (sizeof(bsp_struct_T) * num_structs != m_head.lumps[lump_indx].length) {
+		std::cerr << "ERROR: Reading, num_struts * sizeof(struct) doesn't equal the expected length" << std::endl;
+		this->~BspProcessor();
+		std::exit(EXIT_FAILURE);
+	}
 	// Should probably clear this and resize. So if it was already being used it can be reused.
 	bsp_vec.resize(num_structs);
 	file_stream.seekg(m_head.lumps[lump_indx].offset, std::ios::beg);
-	for (int i = 0; i < num_structs; i++) {
-		file_op(file_stream, reinterpret_cast <char*> (&temp), sizeof(bsp_struct_T));
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// This sort of assignment will not work for all the struct types. Might need to instead write some copy function for each of the types?????
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		bsp_vec[i] = temp;
-	}
-
+	file_op(file_stream, reinterpret_cast <char*> (&bsp_vec[0]), m_head.lumps[lump_indx].length);
 
 }
 

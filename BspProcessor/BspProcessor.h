@@ -134,7 +134,7 @@ private:
 	// Function for reading / writing any of the struct types.
 	//	typename T should be a one of the bsp_structs
 	template<typename bsp_struct_T>
-	void struct_io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, std::vector< bsp_struct_T > bsp_vec, int lump_indx);
+	void struct_io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, std::vector< bsp_struct_T > &bsp_vec, int lump_indx);
 
 
 };
