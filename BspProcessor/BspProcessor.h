@@ -13,6 +13,7 @@ constexpr auto VBSPHEADERBIG = (('V'<<24)+('B'<<16)+('S'<<8)+'P');
 // Little-endian
 constexpr auto VBSPHEADER = (('P'<<24)+('S'<<16)+('B'<<8)+'V');
 constexpr auto VHEADERLUMPS = 64;
+constexpr auto VMAGICNUMSIZE = 4 + 1;
 
 // Create lookup table for the chunks names to indicies
 //	Enum type of whatever it's called 
@@ -32,11 +33,12 @@ struct bsp_lump {
 	uint32_t offset;		// offset (in bytes) of the data from the beginning of the file 
 	uint32_t length;		// length (in bytes) of the data
 	uint32_t version;
-	char	lmpID[4];		// Lump ID 
+	char	 lmpID[4];		// Lump ID 
 };
 
 struct bsp_header {
-	uint32_t magic;
+	//uint32_t magic;
+	char magic[VMAGICNUMSIZE];
 	uint32_t version;
 	bsp_lump lumps[VHEADERLUMPS];
 	uint32_t map_revision;

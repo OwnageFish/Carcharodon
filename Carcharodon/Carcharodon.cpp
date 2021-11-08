@@ -14,8 +14,8 @@ int main()
 	std::cout << "Hello CMake." << std::endl;
 
 	BspProcessor process;
-	process.read_from_file("./test.txt");
-	//process.read_from_file("example.bsp");
+	//process.read_from_file("./test.txt");
+	process.read_from_file("example.bsp");
 
 	return 0;
 }
