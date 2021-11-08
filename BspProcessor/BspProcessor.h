@@ -30,9 +30,9 @@ struct point3s {
 };
 
 struct bsp_lump {
-	int offset;
-	int length;
-	int version;
+	int32_t offset;
+	int32_t length;
+	int32_t version;
 	/*
 	int32_t offset;		// offset (in bytes) of the data from the beginning of the file 
 	int32_t length;		// length (in bytes) of the data
@@ -45,9 +45,9 @@ struct bsp_header {
 	//uint32_t magic;
 	char magic[4];
 
-	int version;
+	int32_t version;
 	bsp_lump lumps[VHEADERLUMPS];
-	int map_revision;
+	int32_t map_revision;
 	//int32_t version;
 	//bsp_lump lumps[VHEADERLUMPS];
 	//int32_t map_revision;
