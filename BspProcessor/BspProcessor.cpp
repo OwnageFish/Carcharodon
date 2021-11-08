@@ -39,18 +39,23 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 
 	unsigned int num_edges = m_head.lumps[BSP_FILE::EDGES].length / sizeof(bsp_edge);
 	file_stream.seekg(m_head.lumps[BSP_FILE::EDGES].offset, std::ios::beg);
-	bsp_edge in_edge;
-	m_edges_wut.resize(num_edges);
-	for (int i = 0; i < num_edges; i++) {
+	m_edges.resize(num_edges);
+	/*for (int i = 0; i < num_edges; i++) {
 		file_op(file_stream, reinterpret_cast <char*> (&in_edge), sizeof(bsp_edge));
 		m_edges_wut[i] = in_edge;
-	}
+	}*/
+	file_op(file_stream, reinterpret_cast <char*> (&m_edges[0]), sizeof(bsp_edge) * num_edges /* == m_head.lumps[BSP_FILE::EDGES].length */);
 
-	std::cout << "Edge info: " << std::endl;
-	std::cout << m_edges_wut.size() << std::endl;
-	std::cout << m_edges_wut[0].vert[0] << ", " << m_edges_wut[0].vert[1] << std::endl;
-	std::cout << m_edges_wut[1].vert[0] << ", " << m_edges_wut[1].vert[1] << std::endl;
-	std::cout << m_edges_wut[2].vert[0] << ", " << m_edges_wut[2].vert[1] << std::endl;
+	unsigned int num_vertexes = m_head.lumps[BSP_FILE::VERTEXES].length / sizeof(point3f);
+	file_stream.seekg(m_head.lumps[BSP_FILE::VERTEXES].offset, std::ios::beg);
+	m_vertexes.resize(num_vertexes);
+	file_op(file_stream, reinterpret_cast <char*> (&m_vertexes[0]), sizeof(point3f) * num_vertexes /* == m_head.lumps[BSP_FILE::VERTEXES].length */ );
+
+	std::cout << "Num edges: " << m_edges.size() << std::endl;
+	for (int i = 0; i < num_edges; i++)
+		std::cout << i << ": " << m_edges[i].vert[0] << " - x=" << m_vertexes[m_edges[i].vert[0]].x << " y=" << m_vertexes[m_edges[i].vert[0]].y << " z=" << m_vertexes[m_edges[i].vert[0]].z
+				  << ", "      << m_edges[i].vert[1] << " - x=" << m_vertexes[m_edges[i].vert[1]].x << " y=" << m_vertexes[m_edges[i].vert[1]].y << " z=" << m_vertexes[m_edges[i].vert[1]].z
+				  << std::endl;
 
 	/*
 	// Trying to read in edges

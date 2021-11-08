@@ -67,8 +67,8 @@ struct surfedge {
 };
 
 struct bsp_edge {
-	unsigned short vert[2];	// Index into vertex array
-	//uint8_t vert[2];		// Index into vertex array
+	//unsigned short vert[2];	// Index into vertex array
+	uint16_t vert[2];		// Index into vertex array
 };
 
 struct bsp_face {
@@ -120,8 +120,9 @@ private:
 	//std::ifstream m_bsp_file;
 	bsp_header m_head;
 
-	bsp_edge* m_edges;
-	std::vector < bsp_edge > m_edges_wut;
+	//bsp_edge* m_edges;
+	std::vector < bsp_edge > m_edges;
+	std::vector < point3f > m_vertexes;
 
 
 	// Probably should add like a allocated flag.
