@@ -121,14 +121,19 @@ private:
 	bsp_header m_head;
 
 	bsp_edge* m_edges;
-	
 	std::vector < bsp_edge > m_edges_wut;
+
 
 	// Probably should add like a allocated flag.
 	//	So I can tell when I need to delete the arrays. and reallocate.
 	bool alloc;
 
 	//char buff;
+
+	// Function for reading / writing any of the struct types.
+	//	typename T should be a one of the bsp_structs
+	template<typename bsp_struct_T>
+	void struct_io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, std::vector< bsp_struct_T > bsp_vec, int lump_indx);
 
 
 };

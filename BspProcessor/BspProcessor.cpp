@@ -18,6 +18,7 @@ BspProcessor::BspProcessor(std::string file_name) {
 
 }
 
+
 void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op) {
 	file_op(file_stream, reinterpret_cast <char*> (&m_head), sizeof(bsp_header));
 
@@ -65,6 +66,29 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 	std::cout << m_edges[0].vert[0] << ", " << m_edges[0].vert[1] << std::endl;
 	*/
 	
+}
+
+//		*** NEVER MIND THIS CAN SEEK TO THE CORRECT SPOT.
+//		Mby it should clear out 
+// This function assumes the filepointer has already been seeked to the offset needed for reading/writing
+//	Not sure if this should be moved into this function. I really don't feel like doing that.
+template<typename bsp_struct_T>
+void BspProcessor::struct_io(std::fstream& file_stream, 
+							 std::function < void(std::fstream&, char*, std::streamsize) > file_op, 
+							 std::vector < bsp_struct_T > bsp_vec, int lump_indx) {
+	unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(T);
+	bsp_struct_T temp;
+	// Should probably clear this and resize. So if it was already being used it can be reused.
+	bsp_vec.resize(num_structs);
+	for (int i = 0; i < num_structs; i++) {
+		file_op(file_stream, reinterpret_cast <char*> (&temp), sizeof(bsp_struct_T));
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// This sort of assignment will not work for all the struct types. Might need to instead write some copy function for each of the types?????
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		bsp_vec[i] = temp;
+	}
+
+
 }
 
 void BspProcessor::read_from_file(std::string file_path) {

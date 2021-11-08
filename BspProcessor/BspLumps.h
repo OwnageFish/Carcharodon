@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <typeinfo>		// For typeid function
 
 namespace BSP_FILE
 {
@@ -139,5 +140,17 @@ namespace BSP_FILE
 		{ LUMP::PHYSLEVEL, "PHYSLEVEL" },
 		{ LUMP::DISP_MULTIBLEND, "DISP_MULTIBLEND" }
 	};
+
+
+	/*
+	//	It's sort of a mapping of the struct types to the lumps that they are relevent for???
+	// I think this is a bad idea and won't really be used.
+	//	Problem is multiple lumps can use the same struct type.
+	//	It's not a 1:1 mapping.
+	//	I don't think this will be used. Can probably just remove, it was a bad idea.
+	const std::map < std::type_info, LUMP > type_names{
+		{ typeid(std::bsp_edge), LUMP::EDGES }
+	};
+	*/
 }
 #endif /* BSP_LUMPS_H */
