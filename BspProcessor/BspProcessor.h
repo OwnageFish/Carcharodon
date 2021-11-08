@@ -24,24 +24,33 @@ struct point3f {
 	float z;
 };
 struct point3s {
-	int16_t x;
-	int16_t y;
-	int16_t z;
+	short x;
+	short y;
+	short z;
 };
 
 struct bsp_lump {
-	uint32_t offset;		// offset (in bytes) of the data from the beginning of the file 
-	uint32_t length;		// length (in bytes) of the data
-	uint32_t version;
+	int offset;
+	int length;
+	int version;
+	/*
+	int32_t offset;		// offset (in bytes) of the data from the beginning of the file 
+	int32_t length;		// length (in bytes) of the data
+	int32_t version;
+	*/
 	char	 lmpID[4];		// Lump ID 
 };
 
 struct bsp_header {
 	//uint32_t magic;
 	char magic[4];
-	uint32_t version;
+
+	int version;
 	bsp_lump lumps[VHEADERLUMPS];
-	uint32_t map_revision;
+	int map_revision;
+	//int32_t version;
+	//bsp_lump lumps[VHEADERLUMPS];
+	//int32_t map_revision;
 };
 
 struct bsp_plane {
@@ -58,7 +67,8 @@ struct surfedge {
 };
 
 struct bsp_edge {
-	uint8_t vert[2];		// Index into vertex array
+	unsigned short vert[2];	// Index into vertex array
+	//uint8_t vert[2];		// Index into vertex array
 };
 
 struct bsp_face {
@@ -111,7 +121,8 @@ private:
 	bsp_header m_head;
 
 	bsp_edge* m_edges;
-	//std::vector < bsp_edge > m_edges_wut;
+	
+	std::vector < bsp_edge > m_edges_wut;
 
 	// Probably should add like a allocated flag.
 	//	So I can tell when I need to delete the arrays. and reallocate.
