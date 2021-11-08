@@ -13,7 +13,6 @@ constexpr auto VBSPHEADERBIG = (('V'<<24)+('B'<<16)+('S'<<8)+'P');
 // Little-endian
 constexpr auto VBSPHEADER = (('P'<<24)+('S'<<16)+('B'<<8)+'V');
 constexpr auto VHEADERLUMPS = 64;
-constexpr auto VMAGICNUMSIZE = 4 + 1;
 
 // Create lookup table for the chunks names to indicies
 //	Enum type of whatever it's called 
@@ -38,7 +37,7 @@ struct bsp_lump {
 
 struct bsp_header {
 	//uint32_t magic;
-	char magic[VMAGICNUMSIZE];
+	char magic[4];
 	uint32_t version;
 	bsp_lump lumps[VHEADERLUMPS];
 	uint32_t map_revision;
@@ -73,7 +72,7 @@ private:
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
 	//std::ifstream m_bsp_file;
 	bsp_header m_head;
-	char buff;
+	//char buff;
 
 
 };
