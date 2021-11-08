@@ -20,7 +20,7 @@ void BspViewer::open(std::string file_name) {
 
 void BspViewer::open() {
 	m_file_ptr.open(m_file_name);
-
+	read();
 }
 
 void BspViewer::render() {
