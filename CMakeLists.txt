@@ -11,3 +11,4 @@ project ("Carcharodon")
 # Include sub-projects.
 add_subdirectory ("Carcharodon")
 add_subdirectory ("BspProcessor")
+add_subdirectory ("BspViewer")
