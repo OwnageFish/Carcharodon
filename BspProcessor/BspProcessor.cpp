@@ -80,6 +80,7 @@ void BspProcessor::struct_io(std::fstream& file_stream,
 	bsp_struct_T temp;
 	// Should probably clear this and resize. So if it was already being used it can be reused.
 	bsp_vec.resize(num_structs);
+	file_stream.seekg(m_head.lumps[lump_indx].offset, std::ios::beg);
 	for (int i = 0; i < num_structs; i++) {
 		file_op(file_stream, reinterpret_cast <char*> (&temp), sizeof(bsp_struct_T));
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
