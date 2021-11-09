@@ -4,6 +4,7 @@
 #include <functional>
 #include <fstream>
 #include <vector>
+#include <cstdint>
 
 namespace {
 
@@ -12,18 +13,18 @@ namespace {
 	template < typename bsp_struct_T >
 	void struct_io(std::fstream& file_stream,
 				   std::function < void(std::fstream&, char*, std::streamsize) > file_op,
-				   std::vector< bsp_struct_T >& bsp_vec, int lump_indx) ) {
-		unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(bsp_struct_T);
+				   std::vector< bsp_struct_T >& bsp_vec, int32_t length) ) {
+		unsigned int num_structs = length / sizeof(bsp_struct_T);
 		// Check for error
-		if (sizeof(bsp_struct_T) * num_structs != m_head.lumps[lump_indx].length) {
+		if (sizeof(bsp_struct_T) * num_structs != length) {
 			std::cerr << "ERROR: Reading, num_struts * sizeof(struct) doesn't equal the expected length" << std::endl;
 			//this->~BspProcessor();
 			std::exit(EXIT_FAILURE);
 		}
 		// Should probably clear this and resize. So if it was already being used it can be reused.
 		bsp_vec.resize(num_structs);
-		file_stream.seekg(m_head.lumps[lump_indx].offset, std::ios::beg);
-		file_op(file_stream, reinterpret_cast <char*> (&bsp_vec[0]), m_head.lumps[lump_indx].length);
+		//file_stream.seekg(m_head.lumps[lump_indx].offset, std::ios::beg);
+		file_op(file_stream, reinterpret_cast <char*> (&bsp_vec[0]), length);
 	}
 
 	//////////////////////////////////////////////////////// This is fucked :(
@@ -46,7 +47,9 @@ namespace {
 
 		// I don't know why this looks like highlighting doesn't know that this function exists.
 		//	Is there some way that you have to reference functions in the current namespace???
+		file_stream.seekg(in_bsp.lump[BSP_FILE::EDGES].offset, std::ios::beg);
 		struct_io(file_stream, file_op, in_bsp.m_edges, BSP_FILE::EDGES);
+		file_stream.seekg(in_bsp.lump[BSP_FILE::VERTEXES].offset, std::ios::beg);
 		struct_io(file_stream, file_op, in_bsp.m_vertexes, BSP_FILE::VERTEXES);
 
 		std::cout << "Num edges: " << m_edges.size() << std::endl;
