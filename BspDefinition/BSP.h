@@ -1,11 +1,18 @@
+#ifndef BSP_H
+#define BSP_H
+
+#include "BspLumps.h"
 
 #include <iostream>
+#include <map>
 #include <string>
 #include <functional>
 #include <fstream>
 #include <vector>
 #include <cstdint>
+#include <cstdlib>
 
+// Anonymous namespace for "private" helper functions
 namespace {
 
 	// NEED TO FIX THIS
@@ -29,7 +36,7 @@ namespace {
 
 	//////////////////////////////////////////////////////// This is fucked :(
 	// Why doesn't this one get all the nice highlighting????
-	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, bsp in_bsp) {
+	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, BSP::bsp in_bsp) {
 		file_op(file_stream, reinterpret_cast <char*> (&in_bsp.m_head), sizeof(bsp_header));
 
 		std::cout << "Magic Number: " << in_bsp.m_head.magic << std::endl;
@@ -60,48 +67,29 @@ namespace {
 
 	}
 
+	// Calculate header for the bsp struct
+	BSP::bsp_header calc_header(BSP::bsp in_bsp) {
+
+
+	}
 } /* anonymous namespace */
 
 
 namespace BSP {
-	// Anonymous namespace for "private" helper functions
-	
-
-	struct point3f {
-		float x;
-		float y;
-		float z;
-	};
-	struct point3s {
-		short x;
-		short y;
-		short z;
-	};
-
-	struct bsp_edge {
-		uint16_t vert[2];		// Index into vertex array
-	};
-
-	struct bsp_header {
-		char		magic[4];
-		int32_t		version;
-		bsp_lump	lumps[VHEADERLUMPS];
-		int32_t		map_revision;
-	};
-
-	struct bsp_lump {
-		int32_t offset;
-		int32_t length;
-		char	lump_ID[4];
-		int32_t version;
-	};
-
 	// All of the things that are contained in a bsp.
 	//	This will get passed into the read/write functions.
 	struct bsp {
-		struct m_head;
-		std::vector < bsp_edge > m_edges;
-		std::vector < point3f >  m_vertexes;
+		bsp_header m_head;
+
+		// I think we should store all the data except for the header in something like this map of vectors.
+		//	It should make it easier much easier to write out, and a little easier to read in.
+		template < typedef bsp_struct_T >
+		std::map < BSP_FILE::LUMP, std::vector< bsp_struct_T > > lump_data = {
+			{ BSP_FILE::EDGES, std::vector < BSP_FILE::bsp_edge > },
+			{ BSP_FILE::VERTEXES, std::vector < BSP_FILE::point3f > }
+		};
+		std::vector < BSP_FILE::bsp_edge > m_edges;
+		std::vector < BSP_FILE::point3f >  m_vertexes;
 
 	};
 
@@ -120,7 +108,7 @@ namespace BSP {
 		io(fs, read_f, )
 	}
 
-	void write_to_rile(std::string file_path) {
+	void write_to_file(std::string file_path, bsp in_bsp) {
 		std::function < void(std::fstream&, char*, std::streamsize) > write_f = [](std::fstream& file, char* dest, std::streamsize dest_sz) {
 			file.write(dest, dest_sz);
 		};
@@ -133,7 +121,29 @@ namespace BSP {
 			std::exit(EXIT_FAILURE);
 		}
 
+		bsp_header temp = in_bsp.m_head;
+		
+		/*	This is copied here b/c I was going to use something like this to calculate the header offsets and lengths.
+		* I think we just calculate the header before writing. This makes writing really easy.
+		for (int iter = 0; iter < VHEADERLUMPS; iter++) {
+			std::cout << "\t" << BSP_FILE::lump_names.at(static_cast <BSP_FILE::LUMP> (iter))
+				<< ": offset = " << in_bsp.m_head.lumps[iter].offset
+				<< ", length = " << in_bsp.m_head.lumps[iter].length
+				<< ", version = " << in_bsp.m_head.lumps[iter].version
+				<< ", lump ID = " << in_bsp.m_head.lumps[iter].lmpID
+				<< std::endl;
+			std::cout << "}" << std::endl;
+		}
+		*/
+
+
+		temp = in_bsp.m_head.lumps[BSP_FILE::EDGES];
+		temp.offset = sizeof(bsp_header);
+		temp.length = 
+		// Need to calculate offsets for each lump. And generate a new 
 		io(fs, write_f);
 	}
 
 } /* BSP */
+
+#endif /* BSP_H */
