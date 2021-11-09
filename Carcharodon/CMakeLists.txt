@@ -9,8 +9,6 @@ include_directories (
 )
 
 # Add BspReader object library?
-#add_library ($<TARGET_OBJECTS:BspReader>)
-
 link_directories ( "${LIBRARY_OUTPUT_PATH}" )
 
 # Add source to this project's executable.
