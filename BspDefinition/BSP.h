@@ -42,6 +42,8 @@ namespace BSP {
 				<< std::endl;
 			std::cout << "}" << std::endl;
 
+			// I don't know why this looks like highlighting doesn't know that this function exists.
+			//	Is there some way that you have to reference functions in the current namespace???
 			struct_io(file_stream, file_op, in_bsp.m_edges, BSP_FILE::EDGES);
 			struct_io(file_stream, file_op, in_bsp.m_vertexes, BSP_FILE::VERTEXES);
 
