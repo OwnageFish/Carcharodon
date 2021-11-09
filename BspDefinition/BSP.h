@@ -6,15 +6,18 @@
 #include <vector>
 
 namespace {
+
+	// NEED TO FIX THIS
+	//	Somehow we need to pass this function the length and offset.
 	template < typename bsp_struct_T >
 	void struct_io(std::fstream& file_stream,
-		std::function < void(std::fstream&, char*, std::streamsize) > file_op,
-		std::vector< bsp_struct_T >& bsp_vec, int lump_indx) ) {
+				   std::function < void(std::fstream&, char*, std::streamsize) > file_op,
+				   std::vector< bsp_struct_T >& bsp_vec, int lump_indx) ) {
 		unsigned int num_structs = m_head.lumps[lump_indx].length / sizeof(bsp_struct_T);
 		// Check for error
 		if (sizeof(bsp_struct_T) * num_structs != m_head.lumps[lump_indx].length) {
 			std::cerr << "ERROR: Reading, num_struts * sizeof(struct) doesn't equal the expected length" << std::endl;
-			this->~BspProcessor();
+			//this->~BspProcessor();
 			std::exit(EXIT_FAILURE);
 		}
 		// Should probably clear this and resize. So if it was already being used it can be reused.
