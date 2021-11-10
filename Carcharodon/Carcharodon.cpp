@@ -4,7 +4,8 @@
 #include <iostream>
 
 //#include "Carcharodon.h"
-#include "BspProcessor.h"
+//#include "BspProcessor.h"
+#include "BSP.h"
 
 int main()
 {
@@ -13,9 +14,12 @@ int main()
 		std::cout << "Little endian" << std::endl;
 	std::cout << "Hello CMake." << std::endl;
 
-	BspProcessor process;
-	//process.read_from_file("./test.txt");
-	process.read_from_file("example.bsp");
+	BSP::bsp_data process;
+
+	std::fstream fs;
+	fs.open("example.bsp", std::fstream::in | std::fstream::binary);
+	BSP::readFromFile(fs, process);
+	BSP::coutData(process);
 
 	return 0;
 }

@@ -12,15 +12,104 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include <string.h>
+#include <typeinfo>
+
+namespace BSP {
+
+	// All of the things that are contained in a bsp.
+	//	This will get passed into the read/write functions.
+	struct bsp_data {
+		BSP_FILE::bsp_header m_head;
+		std::vector < BSP_FILE::bsp_plane >		m_planes;
+		std::vector < BSP_FILE::bsp_vertex >	m_vertexes;
+		std::vector < BSP_FILE::bsp_edge >		m_edges;
+		std::vector < BSP_FILE::bsp_surfedge >	m_surfedges;
+		std::vector < BSP_FILE::bsp_face >		m_faces;
+		std::vector < BSP_FILE::bsp_face >		m_origfaces;
+		std::vector < BSP_FILE::bsp_brush >		m_brushes;
+		std::vector < BSP_FILE::bsp_brushside >	m_brushsides;
+	};
+
+
+	template < typename bsp_struct >
+	void fileToBuffer(std::fstream& file_stream, const BSP_FILE::bsp_lump& lump, std::vector < bsp_struct >& output)												
+	{
+		// Resize synchronization buffer
+		if (lump.length % sizeof(bsp_struct)) {
+			std::cerr << "ERROR: Reading, " << typeid(bsp_struct).name() << " structs, length not evenly divisible by struct size..." << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+		output.resize(lump.length / sizeof(bsp_struct));
+
+		// Actually copy the data
+		file_stream.seekg(lump.offset, std::ios::beg);
+		file_stream.read(reinterpret_cast <char*> (&output[0]), lump.length);
+	}
+
+	void readFromFile(std::fstream& file_stream, BSP::bsp_data& in_bsp) {
+
+		// Read in the header
+		file_stream.read(reinterpret_cast <char*> (&in_bsp.m_head), sizeof(BSP_FILE::bsp_header));
+
+		// Use header info to grab only the stuff we need
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::PLANES)],			in_bsp.m_planes);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::VERTEXES)],		in_bsp.m_vertexes);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::EDGES)],			in_bsp.m_edges);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::SURFEDGES)],		in_bsp.m_surfedges);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::FACES)],			in_bsp.m_faces);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::ORIGINALFACES)],	in_bsp.m_origfaces);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::BRUSHES)],			in_bsp.m_brushes);
+		fileToBuffer(file_stream, in_bsp.m_head.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::BRUSHSIDES)],		in_bsp.m_brushsides);
+	}
+
+	void coutData(const bsp_data& in_bsp)
+	{
+		std::cout << "Magic Number: " << in_bsp.m_head.magic << std::endl;
+		std::cout << "Version Number: " << in_bsp.m_head.version << std::endl;
+		std::cout << "Revision Number: " << in_bsp.m_head.map_revision << std::endl;
+		std::cout << "Lumps: {" << std::endl;
+		for (int iter = 0; iter < BSP_FILE::VHEADERLUMPS; iter++)
+			if (in_bsp.m_head.lumps[iter].length != 0)
+				std::cout << "\t" << BSP_FILE::lump_names.at(static_cast <BSP_FILE::LUMP> (iter))
+				<< ": offset = " << in_bsp.m_head.lumps[iter].offset
+				<< ", length = " << in_bsp.m_head.lumps[iter].length
+				<< ", version = " << in_bsp.m_head.lumps[iter].version
+				<< ", lump ID = " << static_cast <int> (in_bsp.m_head.lumps[iter].lump_ID[0]) << "." << static_cast <int> (in_bsp.m_head.lumps[iter].lump_ID[1] ) << "." << static_cast <int> (in_bsp.m_head.lumps[iter].lump_ID[2]) << "." << static_cast <int> (in_bsp.m_head.lumps[iter].lump_ID[3])
+				<< std::endl;
+		std::cout << "}" << std::endl;
+
+		std::cout << "Num edges: " << in_bsp.m_edges.size() << std::endl;
+		for (int i = 0; i < in_bsp.m_edges.size(); i++)
+		{
+			std::cout << i << ": " << in_bsp.m_edges[i].vert[0] << " - x=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[0]].x << " y=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[0]].y << " z=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[0]].z
+				<< ", " << in_bsp.m_edges[i].vert[1] << " - x=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[1]].x << " y=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[1]].y << " z=" << in_bsp.m_vertexes[in_bsp.m_edges[i].vert[1]].z
+				<< std::endl;
+		}
+	}
+
+} /* BSP */
+
+#endif /* BSP_H */
+
+
+//// START OF THE OVER-ENGINEERING PART
+// 
+// I don't understand the need for over-engineering...
+// This is my problem with following paradigms that make things fast and easy to implement, it ends up being weird and overly complicated to write the base framework
+// Besides that, the BSP format is fairly fixed. We literally want a small subset of the actually available information. And we know how to grab it if needed.
+// I want to get things implemented quickly for now...
+// 
 // Anonymous namespace for "private" helper functions
-namespace {
+/*namespace {
 
 	// NEED TO FIX THIS
 	//	Somehow we need to pass this function the length and offset.
 	template < typename bsp_struct_T >
 	void struct_io(std::fstream& file_stream,
 				   std::function < void(std::fstream&, char*, std::streamsize) > file_op,
-				   std::vector< bsp_struct_T >& bsp_vec, int32_t length) ) {
+				   , int32_t length ){
+				   //std::vector< bsp_struct_T >& bsp_vec, int32_t length ) {
 		unsigned int num_structs = length / sizeof(bsp_struct_T);
 		// Check for error
 		if (sizeof(bsp_struct_T) * num_structs != length) {
@@ -31,26 +120,50 @@ namespace {
 		// Should probably clear this and resize. So if it was already being used it can be reused.
 		bsp_vec.resize(num_structs);
 		//file_stream.seekg(m_head.lumps[lump_indx].offset, std::ios::beg);
-		file_op(file_stream, reinterpret_cast <char*> (&bsp_vec[0]), length);
+		//file_op(file_stream, reinterpret_cast <char*> (&bsp_vec[0]), length);
+		file_op(file_stream, struct_vector, length);
 	}
 
-	//////////////////////////////////////////////////////// This is fucked :(
-	// Why doesn't this one get all the nice highlighting????
-	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, BSP::bsp in_bsp) {
-		file_op(file_stream, reinterpret_cast <char*> (&in_bsp.m_head), sizeof(bsp_header));
+	const std::map < LUMP, bsp_lump_parameters > lump_get_parameters = {
 
-		std::cout << "Magic Number: " << in_bsp.m_head.magic << std::endl;
-		std::cout << "Version Number: " << in_bsp.m_head.version << std::endl;
-		std::cout << "Revision Number: " << in_bsp.m_head.map_revision << std::endl;
-		std::cout << "Lumps: {" << std::endl;
-		for (int iter = 0; iter < VHEADERLUMPS; iter++)
-			std::cout << "\t" << BSP_FILE::lump_names.at(static_cast <BSP_FILE::LUMP> (iter))
-			<< ": offset = " << in_bsp.m_head.lumps[iter].offset
-			<< ", length = " << in_bsp.m_head.lumps[iter].length
-			<< ", version = " << in_bsp.m_head.lumps[iter].version
-			<< ", lump ID = " << in_bsp.m_head.lumps[iter].lmpID
-			<< std::endl;
-		std::cout << "}" << std::endl;
+		// World parameters
+		//{ BSP_FILE::LUMP::ENTITIES, "ENTITIES" }, This needs to be figured out, as this is completely dynamic
+
+		// Stuff needed for basic geometry rendering
+		{ BSP_FILE::LUMP::PLANES,			{ sizeof(bsp_plane),		"PLANES",			1 } },
+		{ BSP_FILE::LUMP::VERTEXES,			{ sizeof(bsp_vertex),		"VERTEXES",			3 } },
+		{ BSP_FILE::LUMP::FACES,			{ sizeof(bsp_face),			"FACES",			7 } },
+		{ BSP_FILE::LUMP::EDGES,			{ sizeof(bsp_edge),			"EDGES",			12 } },
+		{ BSP_FILE::LUMP::SURFEDGES,		{ sizeof(bsp_surfedge),		"SURFEDGES",		13 } },
+		{ BSP_FILE::LUMP::BRUSHES,			{ sizeof(bsp_brush),		"BRUSHES",			18 } },
+		{ BSP_FILE::LUMP::BRUSHSIDES,		{ sizeof(bsp_brushside),	"BRUSHSIDES",		19 } },
+		{ BSP_FILE::LUMP::ORIGINALFACES,	{ sizeof(bsp_face),			"ORIGINALFACES",	27 } },
+
+		// Displacements
+		//{ BSP_FILE::LUMP::DISPINFO,		{ sizeof(int),	"DISPINFO", 26 } },
+		//{ BSP_FILE::LUMP::DISP_VERTS,		{ sizeof(int),	"DISP_VERTS", 33 } },
+		//{ BSP_FILE::LUMP::DISP_TRIS,		{ sizeof(int),	"DISP_TRIS", 48 } }
+	};
+
+	
+	template < typename bsp_struct >
+	void getBufferAndCopy(std::fstream& file_stream, const BSP_FILE::bsp_lump& lump,
+		std::function < void(std::fstream&, char*, std::streamsize) > file_op,	
+		std::vector < bsp_struct >& output)										
+	{
+		// Resize synchronization buffer
+		if (lump.length % sizeof(bsp_struct)) {
+			std::cerr << "ERROR: Reading, " << typeid(bsp_struct).name() << " structs, length not evenly divisible by struct size..." << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+		output.resize(lump.length / sizeof(bsp_struct));
+
+		file_stream.seekg(lump.offset, std::ios::beg);
+		file_op(file_stream, &output[0], lump.length);
+	}
+
+	void io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, BSP::bsp_data& in_bsp) {
+		file_op(file_stream, reinterpret_cast <char*> (&in_bsp.m_head), sizeof(bsp_header));
 
 		// I don't know why this looks like highlighting doesn't know that this function exists.
 		//	Is there some way that you have to reference functions in the current namespace???
@@ -59,41 +172,27 @@ namespace {
 		file_stream.seekg(in_bsp.lump[BSP_FILE::VERTEXES].offset, std::ios::beg);
 		struct_io(file_stream, file_op, in_bsp.m_vertexes, BSP_FILE::VERTEXES);
 
-		std::cout << "Num edges: " << m_edges.size() << std::endl;
+		for (uint8_t iter = 0; iter < VHEADERLUMPS; iter++)
+		{
+			file_stream.seekg(in_bsp.m_head.lumps[iter].offset, std::ios::beg);
+			struct_io (file_stream, file_op, )
+			in_bsp.m_head.lumps [ iter ].
+
+		}
+
+		//std::cout << "Num edges: " << m_edges.size() << std::endl;
 		for (int i = 0; i < in_bsp.m_edges.size(); i++)
+		{
 			std::cout << i << ": " << in_bsp.m_edges[i].vert[0] << " - x=" << in_bsp.m_vertexes[m_edges[i].vert[0]].x << " y=" << in_bsp.m_vertexes[m_edges[i].vert[0]].y << " z=" << in_bsp.m_vertexes[m_edges[i].vert[0]].z
-			<< ", " << in_bsp.m_edges[i].vert[1] << " - x=" << in_bsp.m_vertexes[m_edges[i].vert[1]].x << " y=" << in_bsp.m_vertexes[m_edges[i].vert[1]].y << " z=" << in_bsp.m_vertexes[m_edges[i].vert[1]].z
-			<< std::endl;
+				<< ", " << in_bsp.m_edges[i].vert[1] << " - x=" << in_bsp.m_vertexes[m_edges[i].vert[1]].x << " y=" << in_bsp.m_vertexes[m_edges[i].vert[1]].y << " z=" << in_bsp.m_vertexes[m_edges[i].vert[1]].z
+				<< std::endl;
+		}
 
 	}
 
-	// Calculate header for the bsp struct
-	BSP::bsp_header calc_header(BSP::bsp in_bsp) {
 
 
-	}
-} /* anonymous namespace */
-
-
-namespace BSP {
-	// All of the things that are contained in a bsp.
-	//	This will get passed into the read/write functions.
-	struct bsp {
-		bsp_header m_head;
-
-		// I think we should store all the data except for the header in something like this map of vectors.
-		//	It should make it easier much easier to write out, and a little easier to read in.
-		template < typedef bsp_struct_T >
-		std::map < BSP_FILE::LUMP, std::vector< bsp_struct_T > > lump_data = {
-			{ BSP_FILE::EDGES, std::vector < BSP_FILE::bsp_edge > },
-			{ BSP_FILE::VERTEXES, std::vector < BSP_FILE::point3f > }
-		};
-		std::vector < BSP_FILE::bsp_edge > m_edges;
-		std::vector < BSP_FILE::point3f >  m_vertexes;
-
-	};
-
-	void read_from_file(std::string file_path) {
+	void read_from_file(std::string file_path, const bsp_data& in_bsp) {
 		std::function < void(std::fstream&, char*, std::streamsize) > read_f = [](std::fstream& file, char* dest, std::streamsize dest_sz) {
 			file.read(dest, dest_sz);
 		};
@@ -105,10 +204,10 @@ namespace BSP {
 			//this->~BspProcessor();
 			std::exit(EXIT_FAILURE);
 		}
-		io(fs, read_f, )
+		io(fs, read_f, in_bsp);
 	}
 
-	void write_to_file(std::string file_path, bsp in_bsp) {
+	void write_to_file(std::string file_path, bsp_data& out_bsp) {
 		std::function < void(std::fstream&, char*, std::streamsize) > write_f = [](std::fstream& file, char* dest, std::streamsize dest_sz) {
 			file.write(dest, dest_sz);
 		};
@@ -121,10 +220,10 @@ namespace BSP {
 			std::exit(EXIT_FAILURE);
 		}
 
-		bsp_header temp = in_bsp.m_head;
-		
-		/*	This is copied here b/c I was going to use something like this to calculate the header offsets and lengths.
-		* I think we just calculate the header before writing. This makes writing really easy.
+		//bsp_header temp = out_bsp.m_head;
+
+		// This is copied here b/c I was going to use something like this to calculate the header offsets and lengths.
+		// I think we just calculate the header before writing. This makes writing really easy.
 		for (int iter = 0; iter < VHEADERLUMPS; iter++) {
 			std::cout << "\t" << BSP_FILE::lump_names.at(static_cast <BSP_FILE::LUMP> (iter))
 				<< ": offset = " << in_bsp.m_head.lumps[iter].offset
@@ -134,16 +233,17 @@ namespace BSP {
 				<< std::endl;
 			std::cout << "}" << std::endl;
 		}
-		*/
 
 
-		temp = in_bsp.m_head.lumps[BSP_FILE::EDGES];
-		temp.offset = sizeof(bsp_header);
-		temp.length = 
-		// Need to calculate offsets for each lump. And generate a new 
-		io(fs, write_f);
+		//temp = out_bsp.m_head.lumps[BSP_FILE::EDGES];
+		//temp.offset = sizeof(bsp_header);
+		// Need to calculate offsets for each lump. And generate a new
+		io(fs, write_f, out_bsp);
 	}
 
-} /* BSP */
+	// Calculate header for the bsp struct
+	BSP::bsp_header calc_header(BSP::bsp in_bsp) {
 
-#endif /* BSP_H */
+
+	}
+}*/ /* anonymous namespace */
