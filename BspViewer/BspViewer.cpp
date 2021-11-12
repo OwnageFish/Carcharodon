@@ -1,8 +1,9 @@
 #include "BspViewer.h"
 #include <string>
+#include <iostream>
 
 BspViewer::BspViewer() {
-
+	std::cout << "Hello" << std::endl;
 
 }
 
@@ -13,14 +14,14 @@ BspViewer::BspViewer(std::string file_name) {
 }
 
 void BspViewer::open(std::string file_name) {
-	m_file_name = file_name;
-	open();
+	//m_file_name = file_name;
+	//open();
 
 }
 
 void BspViewer::open() {
-	m_file_ptr.open(m_file_name);
-	read();
+	//m_file_ptr.open(m_file_name);
+	//read();
 }
 
 void BspViewer::render() {

@@ -6,6 +6,7 @@ cmake_minimum_required (VERSION 3.8)
 include_directories (
 	"."
 	"${PROJECT_SOURCE_DIR}/BspDefinition"
+	"${PROJECT_SOURCE_DIR}/BspViewer"
 )
 
 # Add BspReader object library?
@@ -20,6 +21,7 @@ add_executable (Carcharodon "Carcharodon.cpp")
 
 #target_link_libraries (Carcharodon
 #	BspProcessor
+	BspViewer
 #)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/example.bsp
