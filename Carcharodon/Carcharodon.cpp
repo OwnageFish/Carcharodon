@@ -18,6 +18,8 @@ int main()
 	BspProcessor process;
 	process.read_from_file("example.bsp");
 
+	BSP::bsp_data test_bsp;
+
 	BspViewer testView;
 
 	return 0;
