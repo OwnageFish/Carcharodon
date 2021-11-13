@@ -4,7 +4,8 @@
 #include <iostream>
 
 //#include "Carcharodon.h"
-#include "BspProcessor.h"
+//#include "BspProcessor.h"
+#include "BSP.h"
 #include "BspViewer.h"
 
 int main()
@@ -15,7 +16,6 @@ int main()
 	std::cout << "Hello CMake." << std::endl;
 
 	BspProcessor process;
-	//process.read_from_file("./test.txt");
 	process.read_from_file("example.bsp");
 
 	BspViewer testView;
