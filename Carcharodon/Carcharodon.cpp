@@ -15,12 +15,12 @@ int main()
 		std::cout << "Little endian" << std::endl;
 	std::cout << "Hello CMake." << std::endl;
 
-	BspProcessor process;
-	process.read_from_file("example.bsp");
+	//BspProcessor process;
+	//process.read_from_file("example.bsp");
 
 	BSP::bsp_data test_bsp;
 
-	BspViewer testView;
+	//BspViewer testView;
 
 	return 0;
 }

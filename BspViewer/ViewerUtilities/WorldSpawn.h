@@ -1,0 +1,6 @@
+#ifndef VIEWER_WRLDSPWN
+#define VIEWER_WRLDSPWN
+
+
+
+#endif //VIEWER_WRLDSPWN

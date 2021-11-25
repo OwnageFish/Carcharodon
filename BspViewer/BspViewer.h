@@ -1,14 +1,14 @@
 #ifndef BSP_VIEWER_H
 #define BSP_VIEWER_H
 
-#include "BspProcessor.h"
+//#include "BspProcessor.h"
 #include <string>
 #include <fstream>
 
 // This will use opengl and/or imgui to generate a preview of the bsp
 //	I don't know how any of this works :)
 //	Probably just start with imgui and try to make a nice little box :)
-class BspViewer {
+/*class BspViewer {
 public:
 	BspViewer();
 	BspViewer(std::string file_name);
@@ -30,7 +30,7 @@ private:
 	//	Will use BspProcessor.h stuff here.
 	void read();
 
-};
+};*/
 
 
 #endif /* BSP_VIEWER_H */

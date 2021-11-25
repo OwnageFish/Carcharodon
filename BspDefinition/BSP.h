@@ -15,11 +15,11 @@
 #include <string.h>
 #include <typeinfo>
 
-namespace {
+/*namespace {
 	// Return value is the new updated offset.
 	//	The offset for the next lump
 	template < typename bsp_struct >
-	int32_t calcLumpOffLen(BSP_FILE::bsp_lump& lump, const std::vector < bsp_strut >& lump_data, int32_t offset) {
+	int32_t calcLumpOffLen(BSP_FILE::bsp_lump& lump, const std::vector < bsp_struct >& lump_data, int32_t offset) {
 		lump.offset = offset;
 		lump.length = lump_data.size() * sizeof(bsp_struct);
 		return offset + lump.length;
@@ -27,11 +27,11 @@ namespace {
 
 	// Calculate and return a new header, based on the input bsp.
 	//	used for the writing functions.
-	BSP_FILE::bsp_header calcHeader(const BSP::bsp_data& bsp) {
+	BSP_FILE::bsp_header calcHeader(BSP::bsp_data& bsp) {
 		BSP_FILE::bsp_header temp = bsp.m_head;
 
 		// Set all lumps offset and length to 0
-		for (int iter = 0; iter < BSP_FILE::VHEADERLUMPS; i++) {
+		for (int iter = 0; iter < BSP_FILE::VHEADERLUMPS; iter++) {
 			temp.lumps[iter].length = 0;
 			temp.lumps[iter].offset = 0;
 			temp.lumps[iter].lump_ID = bsp.m_head.lumps[iter].lump_ID;
@@ -53,7 +53,7 @@ namespace {
 
 	// Return the new header and let other code decide what to do with it.
 	return temp;
-}
+}*/
 
 namespace BSP {
 	// All of the things that are contained in a bsp.
@@ -114,7 +114,7 @@ namespace BSP {
 		file_stream.write(reinterpret_cast <char*> (&input), lump.length);
 	}
 
-	void writeToFile(std::fstream& file_stream, const BSP::bsp_data& out_bsp) {
+	/*void writeToFile(std::fstream& file_stream, BSP::bsp_data& out_bsp) {
 		BSP_FILE::bsp_header temp = calcHeader(out_bsp);
 		//	Need to decide what to do with the header.
 		//	Probably shouldn't change the out_bsp header.
@@ -130,7 +130,7 @@ namespace BSP {
 		bufferToFile(file_stream, temp.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::ORIGINALFACES)],	out_bsp.m_origfaces);
 		bufferToFile(file_stream, temp.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::BRUSHES)],			out_bsp.m_brushes);
 		bufferToFile(file_stream, temp.lumps[static_cast <uint8_t> (BSP_FILE::LUMP::BRUSHSIDES)],		out_bsp.m_brushsides);
-	}
+	}*/
 
 	void coutData(const bsp_data& in_bsp)
 	{
