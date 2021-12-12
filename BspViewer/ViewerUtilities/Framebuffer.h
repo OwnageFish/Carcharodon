@@ -1,9 +1,7 @@
 #pragma once
 
-#include "GL/glew.h"
-#include "glm/glm.hpp"
-
-
+#include <glew.h>
+#include <glm.hpp>
 
 class ScreenFramebuffer {
 
