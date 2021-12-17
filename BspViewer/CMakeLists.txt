@@ -22,6 +22,8 @@ include_directories (
 
 add_executable (BspViewer WIN32 "BspViewer.cpp")
 
+# target_compile_options(BspViewer PUBLIC "/std:c++latest")
+
 target_link_libraries (BspViewer
 	BspProcessor
 	"${SDL2_LIBRARY}"
@@ -45,6 +47,11 @@ file(GLOB SHADER_SOURCES
 )
 file(COPY ${SHADER_SOURCES}
 	 DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Shaders"
+)
+
+# Copy example BSP
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/example.bsp
+	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Let CMake make use of various external headers

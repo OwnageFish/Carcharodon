@@ -6,6 +6,8 @@
 #include <SDL_opengl.h>
 #include <SDL_image.h>
 
+#include <algorithm>
+#include <numeric>
 #include <string>
 #include <iostream>
 #include <bitset>
@@ -14,6 +16,9 @@
 #include "ViewerUtilities/Shader.h"
 #include "ViewerUtilities/Framebuffer.h"
 #include "ViewerUtilities/RefGrid.h"
+#include "ViewerUtilities/BspPlane.h"
+
+#include "BspProcessor.h"
 
 float deltaTickTime;
 int curTicks, prevTicks;
@@ -84,21 +89,22 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, NULL);
+    //glDebugMessageCallback(MessageCallback, NULL);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_BLEND);
+    //glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Camera::Object cam(glm::vec3(0.0f, 1.0f, 0.0f));
     Camera::MoveInputs mv;
 
-    ScreenFramebuffer scrRenderTarget(1, WindowWidth, WindowHeight);
+    ScreenFramebuffer scrRenderTarget(8, WindowWidth, WindowHeight);
     Shader frameBufferShader("Shaders/fb_vert.glsl", "Shaders/fb_frag.glsl");
     frameBufferShader.use();
     frameBufferShader.setInt("screenTexture", 0);
 
-    GridInternal g(2.5, 5);
+    GridInternal g(16, 5);
 
     GLuint spaceTransUniform;
     struct spaceTransforms {
@@ -124,7 +130,16 @@ int main(int argc, char** argv)
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(spaces.projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+    Shader planeShader ("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
+    glUseProgram(0);
 
+    BspProcessor bsp("example.bsp");
+    std::vector < BspPlane > planes;
+    planes.resize(bsp.m_faces.size());
+    for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
+        //if (bsp.m_faces[it_faces].light_off >= 0)
+        planes[it_faces].Generate(bsp, it_faces);
+            //planes.push_back(BspPlane(bsp, it_faces));
 
     /*GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);
@@ -238,11 +253,14 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		g.Draw();
 
+        planeShader.use();
+        for (std::size_t it_p = 0; it_p < planes.size(); it_p++)
+            planes[it_p].Draw();
+
         // now resolve multisampled buffer(s) into intermediate FBO
         glBindFramebuffer(GL_READ_FRAMEBUFFER, scrRenderTarget.multi_fb);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, scrRenderTarget.postproc_fb);
         glBlitFramebuffer(0, 0, WindowWidth, WindowHeight, 0, 0, WindowWidth, WindowHeight, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
-
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glDisable(GL_DEPTH_TEST);

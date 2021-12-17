@@ -59,7 +59,7 @@ struct bsp_plane {
 	int32_t		  type;
 };
 
-struct surfedge {
+struct bsp_surfedge {
 	int32_t edge;	// Index into edge array.
 					//	**** Need to take abs of this value before using it to index.
 					// Positive means first to second vertx
@@ -72,32 +72,40 @@ struct bsp_edge {
 };
 
 struct bsp_face {
-	uint8_t plane_ID;
+	uint16_t plane_ID;
 	int8_t  side;	// I don't remember somehow this tells you what side of the plane the texture is on.
 					//	Negative means something special. The oposite side of the plane normal? Or something.
 	int8_t	node_bool;  // Pontential values 1 and 0 meaning is this is a node and not a leaf.
 	int32_t first_edge; // index into surfedge
-	int8_t	num_edge;	// Number of surfedges in the surfedge array.
-	int8_t	tex_info;	// index into texture lump
-	int8_t	disp_info;	// displacement info??
-	int8_t	surf_fog_vol_ID;	// If the wiki's confused then I'm ??????????
-	unsigned char styles[4];	// Switchable lighting info????
+	int16_t	num_edges;	// Number of surfedges in the surfedge array.
+	int16_t	tex_info;	// index into texture lump
+	int16_t	disp_info;	// displacement info??
+	int16_t	surf_fog_vol_ID;	// If the wiki's confused then I'm ??????????
+	uint8_t styles[4];	// Switchable lighting info????
 	int32_t	light_off;		// Offset into lightmap lump??? This sounds like this is an index not offset. Or this is going to get real messy.
 	float		 area;		// face are in units^2
 	int32_t	lightmap_text_min_in_lux[2];	// Bro wtf even is this. LUX?
 	int32_t	lightmap_text_siz_in_lux[2];	// Again :) very nice.
 	int32_t	orig_face;		// original face this was split from?
-	uint8_t	num_prims;		// Number of primitives, oh boy, that's pretty sweet :)
-	uint8_t st_prim_ID;		// first primitive index???? I really don't know what id is sounds like an index.
+	uint16_t num_prims;		// Number of primitives, oh boy, that's pretty sweet :)
+	uint16_t first_prim_ID;		// first primitive index???? I really don't know what id is sounds like an index.
 	uint32_t smooth_group;	// Lightmap smoothing group.
 };
+constexpr std::size_t bsp_face_size = sizeof(bsp_face);
 
 struct bsp_texinfo {
 	float	texture_vecs[2][4];		//	[start/end] [xyz offset]
 	float	lightmp_vecs[2][4];		//	[start/end] [xyz offset] - Length is unit texels????/area????
 	int32_t flags;					//	I don't know some flags for some shit, who tf knows.
-	int32_t texdata;				//	Pointer to texture name, size, etc?????
+	int32_t texdata;				//	Pointer to texture entry in TEXDATA lump
+};
 
+struct bsp_texdata_t
+{
+	point3f	reflectivity;		// RGB reflectivity
+	int	nameStringTableID;		// index into TexdataStringTable
+	int	width, height;			// source image
+	int	view_width, view_height;
 };
 
 class BspProcessor {
@@ -115,14 +123,16 @@ public:
 	*/
 
 	~BspProcessor();
-private:
+
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
 	//std::ifstream m_bsp_file;
 	bsp_header m_head;
 
 	//bsp_edge* m_edges;
 	std::vector < bsp_edge > m_edges;
+	std::vector < bsp_surfedge > m_surfedges;
 	std::vector < point3f > m_vertexes;
+	std::vector < bsp_face > m_faces;
 
 
 	// Probably should add like a allocated flag.
@@ -133,8 +143,8 @@ private:
 
 	// Function for reading / writing any of the struct types.
 	//	typename T should be a one of the bsp_structs
-	template<typename bsp_struct_T>
-	void struct_io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, std::vector< bsp_struct_T > &bsp_vec, int lump_indx);
+	template<typename bsp_struct_T, BSP_FILE::LUMP idx>
+	void struct_io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op, std::vector< bsp_struct_T > &bsp_vec);
 
 
 };

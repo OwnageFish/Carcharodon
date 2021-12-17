@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.8)
 
 include_directories (
 	"."
-	"${PROJECT_SOURCE_DIR}/BspDefinition"
+#	"${PROJECT_SOURCE_DIR}/BspDefinition"
 )
 
 # Add source to this project's executable.

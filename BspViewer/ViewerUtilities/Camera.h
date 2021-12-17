@@ -48,7 +48,7 @@ namespace Camera {
 		glm::vec3 focus;			// Focus of view; norm ( focus - position ) should be front
 	};
 
-	const float DEFAULT_MOUSE_X_SENSITIVITY = 0.5f;
+	const float DEFAULT_MOUSE_X_SENSITIVITY = 0.35f;
 	const float DEFAULT_MOUSE_Y_SENSITIVITY = DEFAULT_MOUSE_X_SENSITIVITY;
 	const float DEFAULT_NEAR_Z_PLANE = 0.01f;
 	const float DEFAULT_FAR_Z_PLANE = 1000.0f;
@@ -112,6 +112,7 @@ namespace Camera {
 
 			void ProcessKeyboardAccel(MoveInputs input, float deltaTime)
 			{
+				// Find target velocity and direction
 				if (input.moveKeys.any())
 				{
 					move.target_velocity =  (float)(input.moveKeys.test(Input::FWRD) - input.moveKeys.test(Input::BACK)) * look.front;
@@ -123,15 +124,18 @@ namespace Camera {
 				else
 					move.target_velocity = glm::vec3(0.0);
 
-				//float multiplier = (SPEED / VEL_CHANGE_SPEED * 2) * deltaTime;
+				// Adjust current velocity by resulting speed change over time (given acceleration and time difference)
 				float multiplier = move_opts.acceleration_value * deltaTime;
-				glm::vec3 DiffVelocity = move.target_velocity - move.velocity;
-				if (glm::length(DiffVelocity) > multiplier)
-					move.velocity += move_opts.acceleration_value * glm::normalize(DiffVelocity);
-				else
+				if (input.speedKey)
+					multiplier *= CAM_MOVE_SPEED_MULT;
+				
+				glm::vec3 DiffVel = move.target_velocity - move.velocity;
+				if (glm::length(DiffVel) > multiplier) // Adjust velocity to approach target as much as possible given accel
+					move.velocity += multiplier * glm::normalize(DiffVel);
+				else // We can reach target velocity immediately
 					move.velocity = move.target_velocity;
 
-
+				// Adjust position due to the newly selected velocity
 				look.position += move.velocity * deltaTime;
 			}
 

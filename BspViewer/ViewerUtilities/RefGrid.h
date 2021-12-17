@@ -67,14 +67,19 @@ public:
 
 	void Draw() {
 
+		//glDisable(GL_CULL_FACE);
 		shade->use();
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLE_FAN, sizeof(indices), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+		//glEnable(GL_CULL_FACE);
 	}
 
 	~GridInternal() {
 
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
 		delete shade;
 	}
 };
