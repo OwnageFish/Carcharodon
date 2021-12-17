@@ -39,6 +39,7 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 	struct_io < point3f,		BSP_FILE::VERTEXES >		( file_stream, file_op, m_vertexes );
 	struct_io < bsp_face,		BSP_FILE::FACES >			( file_stream, file_op, m_faces );
 	//struct_io < bsp_face,		BSP_FILE::ORIGINALFACES >	( file_stream, file_op, m_faces );
+	struct_io < bsp_texinfo,	BSP_FILE::TEXINFO >			( file_stream, file_op, m_texinfo);
 }
 
 //		*** NEVER MIND THIS CAN SEEK TO THE CORRECT SPOT.

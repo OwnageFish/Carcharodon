@@ -58,5 +58,11 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/de_shortdust.bsp
 	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+#add_custom_target(copy_shaders ALL
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+#        "${SHADER_SOURCES}" "${CMAKE_CURRENT_BINARY_DIR}/Shaders"
+#    COMMENT "Copy shaders to build tree"
+#    VERBATIM)
+
 # Let CMake make use of various external headers
 add_subdirectory (ViewerUtilities)

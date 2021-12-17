@@ -34,8 +34,9 @@ public:
 		indxs.resize(b.m_faces[f_idx].num_edges);
 		for (std::size_t it_indxs = 0; it_indxs < b.m_faces[f_idx].num_edges; it_indxs++)
 			indxs[it_indxs] = b.m_faces[f_idx].num_edges - it_indxs - 1;
-		//std::iota(indxs.begin(), indxs.end(), 0);
 
+		// If we want the winding order to be in the other direction (we don't ever, I think?), then this is a one liner that does this
+		//	std::iota(indxs.begin(), indxs.end(), 0);
 
 		// Determine first and second vert for first edge
 		int32_t cur_edge = b.m_surfedges[b.m_faces[f_idx].first_edge].edge;
@@ -70,7 +71,7 @@ public:
 
 		glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verts.size(), &verts[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts.size(), &verts[0], GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * indxs.size(), &indxs[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);

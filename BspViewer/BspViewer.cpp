@@ -135,11 +135,23 @@ int main(int argc, char** argv)
 
     BspProcessor bsp("de_shortdust.bsp");
     std::vector < BspPlane > planes;
-    planes.resize(bsp.m_faces.size());
+    std::size_t plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        //if (bsp.m_faces[it_faces].light_off >= 0)
+        if (bsp.m_faces[it_faces].tex_info >= 0)
+            plane_counter++;
+    planes.resize(plane_counter);
+
+    plane_counter = 0;
+    for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
+        if (bsp.m_faces[it_faces].tex_info >= 0)
+            planes[it_faces - plane_counter].Generate(bsp, it_faces - plane_counter);
+        else
+            plane_counter++;
+    /*planes.resize(bsp.m_faces.size());
+    for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
+        if (bsp.m_faces[it_faces].light_off >= 0)
         planes[it_faces].Generate(bsp, it_faces);
-            //planes.push_back(BspPlane(bsp, it_faces));
+            //planes.push_back(BspPlane(bsp, it_faces));*/
 
     /*GLuint VertexArrayID;
     glGenVertexArrays(1, &VertexArrayID);

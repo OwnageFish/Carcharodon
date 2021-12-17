@@ -133,6 +133,7 @@ public:
 	std::vector < bsp_surfedge > m_surfedges;
 	std::vector < point3f > m_vertexes;
 	std::vector < bsp_face > m_faces;
+	std::vector < bsp_texinfo > m_texinfo;
 
 
 	// Probably should add like a allocated flag.
