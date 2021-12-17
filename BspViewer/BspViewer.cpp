@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glEnable(GL_BLEND);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     Camera::Object cam(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     Shader planeShader ("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
     glUseProgram(0);
 
-    BspProcessor bsp("example.bsp");
+    BspProcessor bsp("de_shortdust.bsp");
     std::vector < BspPlane > planes;
     planes.resize(bsp.m_faces.size());
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)

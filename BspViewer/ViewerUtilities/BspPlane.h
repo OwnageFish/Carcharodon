@@ -32,9 +32,9 @@ public:
 		// We are guaranteed to be drawing a convex shape with number of sides defined by face's num_edges
 		//  and we are ordering them according to offsets into our generated vertex array.
 		indxs.resize(b.m_faces[f_idx].num_edges);
-		//for (std::size_t it_indxs = 0; it_indxs < b.m_faces[f_idx].num_edges; it_indxs++)
-		//	indxs[it_indxs] = b.m_faces[f_idx].num_edges - it_indxs - 1;
-		std::iota(indxs.begin(), indxs.end(), 0);
+		for (std::size_t it_indxs = 0; it_indxs < b.m_faces[f_idx].num_edges; it_indxs++)
+			indxs[it_indxs] = b.m_faces[f_idx].num_edges - it_indxs - 1;
+		//std::iota(indxs.begin(), indxs.end(), 0);
 
 
 		// Determine first and second vert for first edge
