@@ -133,43 +133,33 @@ int main(int argc, char** argv)
     Shader planeShader ("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
     glUseProgram(0);
 
-    BspProcessor bsp("de_shortdust.bsp");
+    /* Collect all faces from bsp, and filter out...
+        SURF_NOSHADOWS
+        SURF_SKIP
+        SURF_HINT
+        SURF_NODRAW
+        SURF_TRIGGER
+        SURF_SKY
+        SURF_SKY2D
+    */
+    BspProcessor bsp("de_nuke.bsp");
     std::vector < BspPlane > planes;
     std::size_t plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        if (bsp.m_faces[it_faces].tex_info >= 0)
+        if (bsp.m_faces[it_faces].tex_info >= 0
+            && bsp.m_faces[it_faces].tex_info < bsp.m_texinfo.size()
+            && !(bsp.m_texinfo[bsp.m_faces[it_faces].tex_info].flags & 0x13B6))
             plane_counter++;
     planes.resize(plane_counter);
 
     plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        if (bsp.m_faces[it_faces].tex_info >= 0)
-            planes[it_faces - plane_counter].Generate(bsp, it_faces - plane_counter);
+        if (bsp.m_faces[it_faces].tex_info >= 0
+            && bsp.m_faces[it_faces].tex_info < bsp.m_texinfo.size()
+            && !(bsp.m_texinfo[bsp.m_faces[it_faces].tex_info].flags & 0x13B6))
+            planes[it_faces - plane_counter].Generate(bsp, it_faces);
         else
             plane_counter++;
-    /*planes.resize(bsp.m_faces.size());
-    for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        if (bsp.m_faces[it_faces].light_off >= 0)
-        planes[it_faces].Generate(bsp, it_faces);
-            //planes.push_back(BspPlane(bsp, it_faces));*/
-
-    /*GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-
-    // An array of 3 vectors which represents 3 vertices
-    static const GLfloat g_vertex_buffer_data[] = {
-       -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
-    };
-    
-    GLuint vertexbuffer; // This will identify our vertex buffer
-    glGenBuffers(1, &vertexbuffer); // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer); // The following commands will talk about our 'vertexbuffer' buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW); // Give our vertices to OpenGL.
-
-    Shader basic_shader ("Shaders/basic.vert.glsl", "Shaders/basic.frag.glsl");*/
 
     prevTicks = SDL_GetTicks();
 
@@ -177,6 +167,8 @@ int main(int argc, char** argv)
     params[VIEW_PARAM::FULLSCREEN] = 0;
     params[VIEW_PARAM::RUNNING] = 1;
     params[VIEW_PARAM::MOUSELOOK] = 0;
+
+    bool mouse_warp_event = false;
     while (params[VIEW_PARAM::RUNNING])
     {
         curTicks = SDL_GetTicks();
@@ -240,14 +232,22 @@ int main(int argc, char** argv)
 
             if (SDL_MOUSEMOTION == Event.type && params[VIEW_PARAM::MOUSELOOK]) {
 
+                // Skip mouse event due to warping mouse to middle of window
+                if (mouse_warp_event)
+                {
+                    mouse_warp_event = false;
+                    break;
+                }
+
+                // Calculate mouse difference from center, warp mouse back to center, and process mouse movement
                 int xCenter = WindowWidth / 2;
-                int YCenter = WindowHeight / 2;
-                float xDiff = (float)Event.motion.xrel;// - xCenter;
-                float yDiff = (float)Event.motion.yrel;// - YCenter;
+                int yCenter = WindowHeight / 2;
+                float xDiff = (float)Event.motion.x - xCenter;
+                float yDiff = (float)Event.motion.y - yCenter;
 
-                //SDL_WarpMouseInWindow(window, xCenter, YCenter);
-
+                SDL_WarpMouseInWindow(Window, xCenter, yCenter);
                 cam.ProcessMouse(xDiff, yDiff);
+                mouse_warp_event = true;
             }
         }
 
@@ -266,8 +266,7 @@ int main(int argc, char** argv)
 		g.Draw();
 
         planeShader.use();
-        for (std::size_t it_p = 0; it_p < planes.size(); it_p++)
-            planes[it_p].Draw();
+        for (BspPlane& p : planes) p.Draw();
 
         // now resolve multisampled buffer(s) into intermediate FBO
         glBindFramebuffer(GL_READ_FRAMEBUFFER, scrRenderTarget.multi_fb);
@@ -282,23 +281,6 @@ int main(int argc, char** argv)
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         glEnable(GL_DEPTH_TEST);
         glUseProgram(0);
-
-        /*basic_shader.use();
-
-        // 1st attribute buffer : vertices
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-        glVertexAttribPointer(
-            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            (void*)0            // array buffer offset
-        );
-        // Draw the triangle !
-        glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-        glDisableVertexAttribArray(0);*/
 
         SDL_GL_SwapWindow(Window);
     }

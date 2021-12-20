@@ -57,7 +57,10 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/de_shortnuke.bsp
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/de_shortdust.bsp
 	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
-
+# Copy example BSP
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/de_nuke.bsp
+	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+)
 #add_custom_target(copy_shaders ALL
 #    COMMAND ${CMAKE_COMMAND} -E copy_directory 
 #        "${SHADER_SOURCES}" "${CMAKE_CURRENT_BINARY_DIR}/Shaders"
