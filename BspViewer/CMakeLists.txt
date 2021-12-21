@@ -50,7 +50,7 @@ file(COPY ${SHADER_SOURCES}
 )
 
 # Copy example BSP
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/de_shortnuke.bsp
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/example.bsp
 	 DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 # Copy example BSP

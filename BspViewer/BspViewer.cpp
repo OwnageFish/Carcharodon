@@ -133,30 +133,26 @@ int main(int argc, char** argv)
     Shader planeShader ("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
     glUseProgram(0);
 
-    /* Collect all faces from bsp, and filter out...
-        SURF_NOSHADOWS
-        SURF_SKIP
-        SURF_HINT
-        SURF_NODRAW
-        SURF_TRIGGER
-        SURF_SKY
-        SURF_SKY2D
-    */
-    BspProcessor bsp("de_nuke.bsp");
+    BspProcessor bsp("example.bsp");
     std::vector < BspPlane > planes;
+
+    /* Collect all faces from bsp, and filter out surfaces with one or more of the following properties:
+        0x1XXX - SURF_NOSHADOWS,    0xX2XX - SURF_SKIP,     0xX1XX - SURF_HINT,
+        0xXX8X - SURF_NODRAW,       0xXX4X - SURF_TRIGGER,  0xXXX4 - SURF_SKY,  0xXXX2 - SURF_SKY2D */
+    auto selector = [&bsp](std::size_t f_idx) {
+        return (bsp.m_faces[f_idx].tex_info >= 0 && bsp.m_faces[f_idx].tex_info < bsp.m_texinfo.size() // Verify that face texture info exists in bsp texinfo lump
+            && !(bsp.m_texinfo[bsp.m_faces[f_idx].tex_info].flags & 0x13B6));                          // Verify that faces with flags listed above are filtered. This should be adjusted as needed.
+    };
+
     std::size_t plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        if (bsp.m_faces[it_faces].tex_info >= 0
-            && bsp.m_faces[it_faces].tex_info < bsp.m_texinfo.size()
-            && !(bsp.m_texinfo[bsp.m_faces[it_faces].tex_info].flags & 0x13B6))
+        if (selector (it_faces))
             plane_counter++;
     planes.resize(plane_counter);
 
     plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
-        if (bsp.m_faces[it_faces].tex_info >= 0
-            && bsp.m_faces[it_faces].tex_info < bsp.m_texinfo.size()
-            && !(bsp.m_texinfo[bsp.m_faces[it_faces].tex_info].flags & 0x13B6))
+        if (selector(it_faces))
             planes[it_faces - plane_counter].Generate(bsp, it_faces);
         else
             plane_counter++;

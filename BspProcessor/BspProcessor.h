@@ -127,8 +127,7 @@ public:
 	// Not sure if the file really even has to be saved once it is loaded into memory. Can probably just forget about this.
 	//std::ifstream m_bsp_file;
 	bsp_header m_head;
-
-	//bsp_edge* m_edges;
+	
 	std::vector < bsp_edge > m_edges;
 	std::vector < bsp_surfedge > m_surfedges;
 	std::vector < point3f > m_vertexes;
