@@ -14,13 +14,21 @@ message(STATUS "GLM included at ${GLEW_LIBRARY}")
 include_directories (
 	"."
 	"./ViewerUtilities"
+	"./imgui"
 	"${PROJECT_SOURCE_DIR}/BspProcessor"
 	"${PROJECT_SOURCE_DIR}/ExtrnDll/SDL/include"
 	"${PROJECT_SOURCE_DIR}/ExtrnDll/Glew/include"
 	"${PROJECT_SOURCE_DIR}/ExtrnDll/GLM/include"
 )
 
-add_executable (BspViewer WIN32 "BspViewer.cpp")
+add_executable (BspViewer WIN32 "BspViewer.cpp"
+	"imgui/imgui.cpp"
+	"imgui/imgui_widgets.cpp"
+	"imgui/imgui_tables.cpp"
+	"imgui/imgui_draw.cpp"
+	"imgui/imgui_impl_opengl3.cpp"
+	"imgui/imgui_impl_sdl.cpp"
+)
 
 # target_compile_options(BspViewer PUBLIC "/std:c++latest")
 

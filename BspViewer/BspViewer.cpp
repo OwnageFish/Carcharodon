@@ -1,6 +1,11 @@
+
 #include <glew.h>
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_sdl.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -96,15 +101,38 @@ int main(int argc, char** argv)
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+
+    // ImGUI initialization
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
+    ImGuiWindowFlags window_flags = 0;
+    window_flags = ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_MenuBar
+        | ImGuiWindowFlags_NoMove
+        | ImGuiWindowFlags_NoResize
+        | ImGuiWindowFlags_NoCollapse;
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.WindowBorderSize = 0.0f;
+    style.WindowRounding = 0.0f;
+
+    // Setup Platform/Renderer bindings
+    const char* glsl_version = "#version 330 core";
+    ImGui_ImplSDL2_InitForOpenGL(Window, Context);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+    //io.Fonts->AddFontFromFileTTF("../../assets/fonts/Treb.ttf", 14.0f);
+    
+
     Camera::Object cam(glm::vec3(0.0f, 1.0f, 0.0f));
     Camera::MoveInputs mv;
 
-    ScreenFramebuffer scrRenderTarget(8, WindowWidth, WindowHeight);
+    ScreenFramebuffer scrRenderTarget(1, WindowWidth, WindowHeight);
     Shader frameBufferShader("Shaders/fb_vert.glsl", "Shaders/fb_frag.glsl");
     frameBufferShader.use();
     frameBufferShader.setInt("screenTexture", 0);
-
-    GridInternal g(16, 5);
 
     GLuint spaceTransUniform;
     struct spaceTransforms {
@@ -118,6 +146,9 @@ int main(int argc, char** argv)
     spaces.projection = glm::perspective(glm::radians(cam.look_opts.field_of_view), static_cast <float> (WindowWidth) / WindowHeight, cam.look_opts.near_z_plane, cam.look_opts.far_z_plane);
 
     // Set binding points
+    float grid_width = 16.0;
+    int grid_space = 5;
+    GridInternal g(grid_width, grid_space);
     GLuint spaceTfBindPt = 0;
     glUniformBlockBinding(g.shade->ID, glGetUniformBlockIndex(g.shade->ID, "spaceTransforms"), spaceTfBindPt);
 
@@ -140,8 +171,9 @@ int main(int argc, char** argv)
         0x1XXX - SURF_NOSHADOWS,    0xX2XX - SURF_SKIP,     0xX1XX - SURF_HINT,
         0xXX8X - SURF_NODRAW,       0xXX4X - SURF_TRIGGER,  0xXXX4 - SURF_SKY,  0xXXX2 - SURF_SKY2D */
     auto selector = [&bsp](std::size_t f_idx) {
-        return (bsp.m_faces[f_idx].tex_info >= 0 && bsp.m_faces[f_idx].tex_info < bsp.m_texinfo.size() // Verify that face texture info exists in bsp texinfo lump
-            && !(bsp.m_texinfo[bsp.m_faces[f_idx].tex_info].flags & 0x13B6));                          // Verify that faces with flags listed above are filtered. This should be adjusted as needed.
+        //return (bsp.m_faces[f_idx].tex_info >= 0 && bsp.m_faces[f_idx].tex_info < bsp.m_texinfo.size() // Verify that face texture info exists in bsp texinfo lump
+        //    && !(bsp.m_texinfo[bsp.m_faces[f_idx].tex_info].flags & 0x13B6));                          // Verify that faces with flags listed above are filtered. This should be adjusted as needed.
+        return true;
     };
 
     std::size_t plane_counter = 0;
@@ -158,6 +190,8 @@ int main(int argc, char** argv)
             plane_counter++;
 
     prevTicks = SDL_GetTicks();
+
+    glm::vec4 bgColor(0.125f, 0.0625f, 0.0625f, 1.0);
 
     viewer_params params;
     params[VIEW_PARAM::FULLSCREEN] = 0;
@@ -257,7 +291,7 @@ int main(int argc, char** argv)
 
         // Draw stuff to framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, scrRenderTarget.multi_fb);
-		glClearColor(0.05f, 0.1f, 0.1f, 0.0f);
+        glClearColor(bgColor.x, bgColor.y, bgColor.z, bgColor.w);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		g.Draw();
 
@@ -278,7 +312,40 @@ int main(int argc, char** argv)
         glEnable(GL_DEPTH_TEST);
         glUseProgram(0);
 
+        // ImGUI stuff
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(Window);
+        ImGui::NewFrame();
+
+        {
+
+            ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+            ImGui::SetNextWindowSize(ImVec2(360.f, (float)WindowHeight));
+            ImGui::Begin("Hello, world!", NULL, window_flags);                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            if (ImGui::Button("Quit"))	params[VIEW_PARAM::RUNNING] = 0;
+            ImGui::ColorEdit3("Clear color", (float*)&bgColor); // Edit 3 floats representing a color
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+            if (ImGui::SliderFloat("Width", &grid_width, 0.0f, pow(2, grid_space) - 0.001))
+                g.SetLineWidth(grid_width);
+            if (ImGui::SliderInt("Spacing", &grid_space, 0, 16))
+                g.SetSpacing(grid_space);
+
+            ImGui::End();
+        }
+
+        ImGui::Render(); // Generate the menu
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData()); // Actually draw menu
+
         SDL_GL_SwapWindow(Window);
     }
+
+    SDL_GL_DeleteContext(Context);
+    SDL_DestroyWindow(Window);
+    SDL_Quit();
+
     return 0;
 }
