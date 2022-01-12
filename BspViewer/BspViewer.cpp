@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     ImGui_ImplSDL2_InitForOpenGL(Window, Context);
     ImGui_ImplOpenGL3_Init(glsl_version);
     //io.Fonts->AddFontFromFileTTF("../../assets/fonts/Treb.ttf", 14.0f);
-    
+
 
     Camera::Object cam(glm::vec3(0.0f, 1.0f, 0.0f));
     Camera::MoveInputs mv;
@@ -161,33 +161,54 @@ int main(int argc, char** argv)
     glBufferSubData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(spaces.projection));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    Shader planeShader ("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
+    Shader planeShader("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
     glUseProgram(0);
 
-    BspProcessor bsp("example.bsp");
+    BspProcessor bsp("de_shortdust.bsp");
     std::vector < BspPlane > planes;
 
-    /* Collect all faces from bsp, and filter out surfaces with one or more of the following properties:
-        0x1XXX - SURF_NOSHADOWS,    0xX2XX - SURF_SKIP,     0xX1XX - SURF_HINT,
-        0xXX8X - SURF_NODRAW,       0xXX4X - SURF_TRIGGER,  0xXXX4 - SURF_SKY,  0xXXX2 - SURF_SKY2D */
+    /*
+    // THIS IS NOW A NOT NECESSARILY VALID SELECTOR. FACES ARE NOT TO BE DIRECTLY RENDERED JUST LIKE THIS.
+    // A FILTER SHOULD BE APPLIED IN A DIFFERENT STEP
+    // ACTUALLY, A CLASS SHOULD REPRESENT THE WORLD AND SELECT THE PARTS WE CONSIDER RENDERABLE
+    // Collect all faces from bsp, and filter out surfaces with one or more of the following properties:
+    //  0x1XXX - SURF_NOSHADOWS,    0xX2XX - SURF_SKIP,     0xX1XX - SURF_HINT,
+    //  0xXX8X - SURF_NODRAW,       0xXX4X - SURF_TRIGGER,  0xXXX4 - SURF_SKY,  0xXXX2 - SURF_SKY2D
     auto selector = [&bsp](std::size_t f_idx) {
         //return (bsp.m_faces[f_idx].tex_info >= 0 && bsp.m_faces[f_idx].tex_info < bsp.m_texinfo.size() // Verify that face texture info exists in bsp texinfo lump
         //    && !(bsp.m_texinfo[bsp.m_faces[f_idx].tex_info].flags & 0x13B6));                          // Verify that faces with flags listed above are filtered. This should be adjusted as needed.
         return true;
     };
 
+    // Count faces that we consider worthy of rendering
     std::size_t plane_counter = 0;
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
         if (selector (it_faces))
             plane_counter++;
     planes.resize(plane_counter);
-
     plane_counter = 0;
+
+    // Generate only those faces we want to render
     for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
         if (selector(it_faces))
             planes[it_faces - plane_counter].Generate(bsp, it_faces);
         else
             plane_counter++;
+    */
+
+    // Generate every face
+    planes.resize(bsp.m_faces.size());
+    for (std::size_t it_faces = 0; it_faces < bsp.m_faces.size(); it_faces++)
+        planes[it_faces].Generate(bsp, it_faces);
+
+    // Iterate over models, and apply offsets given there. DON'T skip worldspawn (index 0)
+    for (std::size_t it_models = 0; it_models < bsp.m_brushmodels.size(); it_models++)
+    {
+        bsp_model m = bsp.m_brushmodels[it_models];
+        if (m.origin.x != 0 || m.origin.y != 0 || m.origin.z != 0)
+            for (std::size_t it_faces = 0; it_faces < m.numfaces; it_faces++)
+                planes[m.firstface + it_faces].ApplyOffset(m.origin);
+    }
 
     prevTicks = SDL_GetTicks();
 
@@ -219,8 +240,8 @@ int main(int argc, char** argv)
                     break;
                 case SDLK_z:
                     params[VIEW_PARAM::MOUSELOOK] = !params[VIEW_PARAM::MOUSELOOK];
-                    if (params[VIEW_PARAM::MOUSELOOK])  SDL_ShowCursor(SDL_DISABLE);
-                    else                                SDL_ShowCursor(SDL_ENABLE);
+                    //if (params[VIEW_PARAM::MOUSELOOK])  SDL_ShowCursor(SDL_DISABLE);
+                    //else                                SDL_ShowCursor(SDL_ENABLE);
                     break;
                 case SDLK_ESCAPE:
                 case SDLK_q:        params[VIEW_PARAM::RUNNING] = 0;    break;
@@ -325,6 +346,12 @@ int main(int argc, char** argv)
 
             ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
             if (ImGui::Button("Quit"))	params[VIEW_PARAM::RUNNING] = 0;
+            if (ImGui::Button("Fullscreen"))
+            {
+                params[VIEW_PARAM::FULLSCREEN] = !params[VIEW_PARAM::FULLSCREEN];
+                WindowFlags ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
+                SDL_SetWindowFullscreen(Window, WindowFlags);
+            }
             ImGui::ColorEdit3("Clear color", (float*)&bgColor); // Edit 3 floats representing a color
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);

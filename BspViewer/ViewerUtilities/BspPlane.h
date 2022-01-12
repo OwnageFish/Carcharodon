@@ -22,11 +22,15 @@ public:
 	std::vector < int > indxs;
 	std::vector < float > verts;
 
+	point3f offset;
+
 	BspPlane() {}
 
 	BspPlane(const BspProcessor& b, const std::size_t& f_idx) { Generate(b, f_idx); }
 
 	void Generate(const BspProcessor& b, const std::size_t& f_idx) {
+
+		offset.x = offset.y = offset.z = 0;
 
 		// Our index list is just a vector of numbers counting from 0 upwards
 		// We are guaranteed to be drawing a convex shape with number of sides defined by face's num_edges
@@ -79,6 +83,48 @@ public:
 		glBindVertexArray(0);
 
 		//shade = new Shader("Shaders/bsp_plane_vert.glsl", "Shaders/bsp_plane_frag.glsl");
+	}
+
+	// Applying new offsets consecutively and using this often can result in numerical instability. Currently used in initialization. Use sparingly until interface changes.
+	void ApplyOffset( const point3f & off) {
+
+		offset.x -= off.x;
+		offset.y += off.z;
+		offset.z += off.y;
+
+		// Apply offset to vertices
+		for (std::size_t ie = 0; ie < verts.size(); ie+=3)
+		{
+			verts[ie + 0] += -off.x;
+			verts[ie + 1] +=  off.z;
+			verts[ie + 2] +=  off.y;
+		}
+
+		// Bind our buffer, apply new vertex data
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts.size(), &verts[0], GL_STATIC_DRAW);
+		glBindVertexArray(0);
+	}
+
+	// Applying subsequent offsets, then resetting... This can quickly result in numerical instability. Do not use.
+	void ResetOffset() {
+
+		// Remove offset from vertices, reset current offset.
+		for (std::size_t ie = 0; ie < verts.size(); ie += 3)
+		{
+			verts[ie + 0] -= -offset.x;
+			verts[ie + 1] -=  offset.z;
+			verts[ie + 2] -=  offset.y;
+		}
+
+		offset.x = offset.y = offset.z = 0;
+
+		// Bind our buffer, apply new vertex data
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * verts.size(), &verts[0], GL_STATIC_DRAW);
+		glBindVertexArray(0);
 	}
 
 	void Draw() {

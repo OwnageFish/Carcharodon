@@ -141,6 +141,60 @@ namespace BSP_FILE
 		{ LUMP::DISP_MULTIBLEND, "DISP_MULTIBLEND" }
 	};
 
+	enum TEXINFO_FLAGS {
+		SURF_LIGHT		= 0x0001,	// Value will hold the light strength
+		SURF_SKY2D		= 0x0002,	// Don't draw, but add as a 2D skybox drawing surface (no 3D skybox visible)
+		SURF_SKY		= 0x0004,	// Don't draw, but add as a 3D skybox drawing surface
+		SURF_WARP		= 0x0008,	// Turbulent water warping effect
+		SURF_TRANS		= 0x0010,	// Texture is transluscent
+		SURF_NOPORTAL	= 0x0020,	// This surface can't have a portal placed on it
+		SURF_TRIGGER	= 0x0040,	// Xbox hack to work around elimination of trigger surfaces, which breaks occludars. Probably ignore this flag.
+		SURF_NODRAW		= 0x0080,	// Don't bother referencing the texture, or drawing one
+		SURF_HINT		= 0x0100,	// Make a primary BSP splitter face/plane
+		SURF_SKIP		= 0x0200,	// Completely ignore, allowing non-closed brushes
+		SURF_NOLIGHT	= 0x0400,	// Don't calculate light
+		SURF_BUMPLIGHT	= 0x0800,	// Calculate 3 lightmaps for the surface, for bumpmapping purposes
+		SURF_NOSHADOWS	= 0x1000,	// Don't receive shadows
+		SURF_NODECALS	= 0x2000,	// Don't receive decals
+		SURF_NOCHOP		= 0x4000,	// Don't subdivide patches on this surface
+		SURF_HITBOX		= 0x8000	// This surface is part of a hitbox
+	};
+
+	enum BRUSH_CONTENTS_FLAGS {
+		CONTENTS_EMPTY					= 0x00000000,	// No contents, at all
+		CONTENTS_SOLID					= 0x00000001,	// Solid; eye is never valid here
+		CONTENTS_WINDOW					= 0x00000002,	// Transluscent (glass, not water)
+		CONTENTS_AUX					= 0x00000004,	// 
+		CONTENTS_GRATE					= 0x00000008,	// Alpha-tested "grate" textures. Bullets/sight pass through, solids do not.
+		CONTENTS_SLIME					= 0x00000010,	// 
+		CONTENTS_WATER					= 0x00000020,	// 
+		CONTENTS_MIST					= 0x00000040,	// 
+		CONTENTS_OPAQUE					= 0x00000080,	// Block AI line-of-sight
+		CONTENTS_TESTFOGVOLUME			= 0x00000100,	// Volumes that cannot be seen through (possibly non-solid)
+		CONTENTS_UNUSED					= 0x00000200,	// Unused
+		CONTENTS_UNUSED6				= 0x00000400,	// Unused
+		CONTENTS_TEAM1					= 0x00000800,	// Per-team contents used to differentiate collisions between 
+		CONTENTS_TEAM2					= 0x00001000,	//  players and objects on different teams
+		CONTENTS_IGNORE_NODRAW_OPAQUE	= 0x00002000,	// Ignore CONTENTS_OPAQUE on surfaces that have SURF_NODRAW
+		CONTENTS_MOVEABLE				= 0x00004000,	// Hits entities which are MOVETYPE_PUSH (doors, platforms, etc.)
+		CONTENTS_AREAPORTAL				= 0x00008000,	// All remaining contents are non-visible, and don't eat brushes
+		CONTENTS_PLAYERCLIP				= 0x00010000,	// 
+		CONTENTS_MONSTERCLIP			= 0x00020000,	// 
+		CONTENTS_CURRENT_0				= 0x00040000,	// { //Currents can be added to any other contents, may be mixed (what are they though?)
+		CONTENTS_CURRENT_90				= 0x00080000,	//  |
+		CONTENTS_CURRENT_180			= 0x00100000,	//  |
+		CONTENTS_CURRENT_270			= 0x00200000,	//  |
+		CONTENTS_CURRENT_UP				= 0x00400000,	//  |
+		CONTENTS_CURRENT_DOWN			= 0x00800000,	// }
+		CONTENTS_ORIGIN					= 0x01000000,	// Removed before bsping an entity
+		CONTENTS_MONSTER				= 0x02000000,	// Monster? This should never be on a brush, only in game
+		CONTENTS_DEBRIS					= 0x04000000,	// 
+		CONTENTS_DETAIL					= 0x08000000,	// Brushes to be added after vis leafs
+		CONTENTS_TRANSLUCENT			= 0x10000000,	// Auto-set if any surface has transparency
+		CONTENTS_LADDER					= 0x20000000,	// 
+		CONTENTS_HITBOX					= 0x40000000	// Use accurate hitboxes on physics/damage trace
+	};
+
 
 	/*
 	//	It's sort of a mapping of the struct types to the lumps that they are relevent for???

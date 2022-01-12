@@ -21,7 +21,7 @@ BspProcessor::BspProcessor(std::string file_name) {
 void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstream&, char*, std::streamsize) > file_op) {
 	file_op(file_stream, reinterpret_cast <char*> (&m_head), sizeof(bsp_header));
 
-	std::cout << "Magic Number: " << m_head.magic << std::endl;
+	/*std::cout << "Magic Number: " << m_head.magic << std::endl;
 	std::cout << "Version Number: " << m_head.version << std::endl;
 	std::cout << "Revision Number: " << m_head.map_revision << std::endl;
 	std::cout << "Lumps: {" << std::endl;
@@ -31,15 +31,24 @@ void BspProcessor::io(std::fstream& file_stream, std::function < void(std::fstre
 			<< ": offset = " << m_head.lumps[iter].offset
 			<< ", length = " << m_head.lumps[iter].length
 			<< std::endl;
-	std::cout << "}" << std::endl;
+	std::cout << "}" << std::endl;*/
 
 	// All are needed to prepare the scene.
+	struct_io < point3f, BSP_FILE::VERTEXES >(file_stream, file_op, m_vertexes);
 	struct_io < bsp_edge,		BSP_FILE::EDGES >			( file_stream, file_op, m_edges );
 	struct_io < bsp_surfedge,	BSP_FILE::SURFEDGES >		( file_stream, file_op, m_surfedges );
-	struct_io < point3f,		BSP_FILE::VERTEXES >		( file_stream, file_op, m_vertexes );
 	struct_io < bsp_face,		BSP_FILE::FACES >			( file_stream, file_op, m_faces );
-	//struct_io < bsp_face,		BSP_FILE::ORIGINALFACES >	( file_stream, file_op, m_faces );
-	struct_io < bsp_texinfo,	BSP_FILE::TEXINFO >			( file_stream, file_op, m_texinfo);
+	struct_io < bsp_face,		BSP_FILE::ORIGINALFACES >	( file_stream, file_op, m_originalfaces );
+	
+	struct_io < bsp_texinfo,	BSP_FILE::TEXINFO >			( file_stream, file_op, m_texinfos );
+	struct_io < bsp_texdata,	BSP_FILE::TEXDATA >			( file_stream, file_op, m_texdatas );
+
+	struct_io < bsp_node,		BSP_FILE::NODES >			( file_stream, file_op, m_nodes );
+	struct_io < bsp_leaf,		BSP_FILE::LEAFS >			( file_stream, file_op, m_leafs );
+	struct_io < uint16_t,		BSP_FILE::LEAFFACES >		( file_stream, file_op, m_leaffaces );
+	struct_io < uint16_t,		BSP_FILE::LEAFBRUSHES >		( file_stream, file_op, m_leafbrushes );
+
+	struct_io < bsp_model,		BSP_FILE::MODELS >			( file_stream, file_op, m_brushmodels );
 }
 
 //		*** NEVER MIND THIS CAN SEEK TO THE CORRECT SPOT.

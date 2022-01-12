@@ -9,7 +9,7 @@ find_library(SDL2_LIBRARY REQUIRED NAMES SDL2 PATHS "${PROJECT_SOURCE_DIR}/Extrn
 find_library(SDL2Main_LIBRARY REQUIRED NAMES SDL2main PATHS "${PROJECT_SOURCE_DIR}/ExtrnDll/SDL")
 find_library(GLEW_LIBRARY REQUIRED NAMES glew32 PATHS "${PROJECT_SOURCE_DIR}/ExtrnDll/Glew")
 # find_library(GLEW_LIBRARY REQUIRED NAMES glew32s PATHS "${PROJECT_SOURCE_DIR}/ExtrnDll/Glew")
-message(STATUS "GLM included at ${GLEW_LIBRARY}")
+message(STATUS "SDL2 Library included at ${SDL2_LIBRARY}")
 
 include_directories (
 	"."
